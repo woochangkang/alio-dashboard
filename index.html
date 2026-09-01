@@ -315,7 +315,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
     <figure>
       <div class="fig-head"><p class="fig-t">게시판별 수집 레코드 수</p><p class="fig-s">2026년 6월 기준 · 총 81,474건</p></div>
       <div class="plot"><div id="c-boards"></div></div>
-      <figcaption><b>읽는 법</b><span>막대 길이는 <em>수집된 레코드 수</em>다. 사건의 수가 아니다. ‘국회 지적 22,373’은 국회가 22,373번 지적했다는 뜻이 아니다. 기관들이 그만큼의 공시 항목을 올렸다는 뜻이다. 실제 분석에 쓰는 지적 건수는 중복을 걷어내면 13,948건으로 줄어든다.</span></figcaption>
+      <figcaption><b>읽는 법</b><span>막대 길이는 사건의 수가 아니라 <em>수집된 레코드 수</em>다. ‘국회 지적 22,373’은 국회가 22,373번 지적했다는 뜻이 아니다. 기관들이 그만큼의 공시 항목을 올렸다는 뜻이다. 실제 분석에 쓰는 지적 건수는 중복을 걷어내면 13,948건으로 줄어든다.</span></figcaption>
     </figure>
 
     <h3 class="blk">통계항목 트리 <span class="code">559 항목 · 3 대분류</span></h3>
@@ -324,7 +324,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
       <figure>
         <div class="fig-head"><p class="fig-t">대분류별 항목 수</p><p class="fig-s">전체 559개 항목</p></div>
         <div class="plot"><div id="c-itemtop"></div></div>
-        <figcaption><b>읽는 법</b><span>기관운영(인사·보수·채용)이 전체의 60%를 차지한다. 재무 항목은 145개뿐이다. 그나마도 회계기준(K-GAAP/IFRS)이나 사업 구분에 따라 <em>일부 기관만 값을 갖는다</em>.</span></figcaption>
+        <figcaption><b>읽는 법</b><span>기관운영(인사·보수·채용)이 전체의 60%를 차지한다. 재무 항목은 145개뿐인데 그나마도 회계기준(K-GAAP/IFRS)이나 사업 구분에 따라 <em>일부 기관만 값을 갖는다</em>.</span></figcaption>
       </figure>
       <div class="card">
         <p class="fig-t">패널로 쓸 수 있는 항목의 조건</p>
@@ -361,7 +361,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
       <div class="arw">→</div>
       <div class="node"><div class="h">파싱 · 정규화</div><ul><li>항목 트리 평탄화</li><li>임원표 HTML 파싱</li><li>수의계약 시트 파싱<br>(셀 숫자서식 기반 단위 판정)</li><li>지적 레코드 중복 제거</li></ul></div>
       <div class="arw">→</div>
-      <div class="node"><div class="h">분석 단위</div><ul><li>기관 — 355</li><li>기관×연도 — 2,130</li><li>임명 spell — 11,821</li><li>계약 — 644,239</li><li>지적 레코드 — 13,948</li></ul></div>
+      <div class="node"><div class="h">분석 단위</div><ul><li>기관: 355</li><li>기관×연도: 2,130</li><li>임명 spell: 11,821</li><li>계약: 644,239</li><li>지적 레코드: 13,948</li></ul></div>
     </div>
 
     <h3 class="blk">주요 산출물</h3>
@@ -378,20 +378,20 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
         <p class="fig-t">A. 기관 속성 <span class="mono" style="color:var(--ink-3);font-size:11px">institutions.csv</span></p>
         <p class="fig-s" style="margin-bottom:8px">시간에 따라 변하지 않는 고정효과 후보</p>
         <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)">
-          <li><b>기관유형</b> 5범주 — 공기업(시장·준시장), 준정부(기금·위탁), 기타공공기관</li>
-          <li><b>주무부처</b> 38개 — 정치적 통제 경로의 대리변수</li>
-          <li><b>소재지</b> 17개 시·도 — 지방이전 정책의 흔적</li>
-          <li><b>설립연도</b> 1905–2025 — 기관 연령</li>
+          <li><b>기관유형</b> 5범주: 공기업(시장·준시장), 준정부(기금·위탁), 기타공공기관</li>
+          <li><b>주무부처</b> 38개: 정치적 통제 경로의 대리변수</li>
+          <li><b>소재지</b> 17개 시·도: 지방이전 정책의 흔적</li>
+          <li><b>설립연도</b> 1905–2025: 기관 연령</li>
         </ul>
       </div>
       <div class="card">
         <p class="fig-t">B. 규모·재정 <span class="mono" style="color:var(--ink-3);font-size:11px">panel_statistics_long</span></p>
         <p class="fig-s" style="margin-bottom:8px">기관×연도 연속변수 · 284개 항목</p>
         <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)">
-          <li><b>임직원</b> — 총계·정원·현원·여성·비정규직·소속외인력</li>
-          <li><b>신규채용</b> — 청년·여성·장애인·지역인재별</li>
-          <li><b>수입/지출/정부순지원</b> — 재정 자립도</li>
-          <li><b>보수</b> — 임원 연봉, 직원 1인당, 신입 초임, 근속</li>
+          <li><b>임직원</b>: 총계·정원·현원·여성·비정규직·소속외인력</li>
+          <li><b>신규채용</b>: 청년·여성·장애인·지역인재별</li>
+          <li><b>수입/지출/정부순지원</b>: 재정 자립도</li>
+          <li><b>보수</b>: 임원 연봉, 직원 1인당, 신입 초임, 근속</li>
         </ul>
       </div>
       <div class="card">
@@ -399,19 +399,19 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
         <p class="fig-s" style="margin-bottom:8px">기관×공시시점×임원 → 임명 spell로 변환</p>
         <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)">
           <li><b>임명일·계획 임기·중도이탈</b> 추정</li>
-          <li><b>직위</b> 8종 — 기관장·이사·감사, 상임/비상임</li>
-          <li><b>정치성 라벨</b> 6범주 — 주요경력 LLM 분류</li>
-          <li><b>정권교체 결합</b> — 교체 후 경과일, 12개월 내 임명</li>
+          <li><b>직위</b> 8종: 기관장·이사·감사, 상임/비상임</li>
+          <li><b>정치성 라벨</b> 6범주: 주요경력 LLM 분류</li>
+          <li><b>정권교체 결합</b>: 교체 후 경과일, 12개월 내 임명</li>
         </ul>
       </div>
       <div class="card">
         <p class="fig-t">D. 계약·감독 <span class="mono" style="color:var(--ink-3);font-size:11px">sole_source_* · point_findings_*</span></p>
         <p class="fig-s" style="margin-bottom:8px">기관 행위와 외부 감독의 관측치</p>
         <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)">
-          <li><b>수의계약</b> — 계약명·금액·거래처, 644,239건</li>
-          <li><b>거래처 집중도</b> — 최대 거래처 점유율</li>
-          <li><b>국회·감사원 지적</b> — 시행일 기준 13,948 레코드</li>
-          <li><b>이사회 회의록·감사결과</b> — 원문 미파싱</li>
+          <li><b>수의계약</b>: 계약명·금액·거래처, 644,239건</li>
+          <li><b>거래처 집중도</b>: 최대 거래처 점유율</li>
+          <li><b>국회·감사원 지적</b>: 시행일 기준 13,948 레코드</li>
+          <li><b>이사회 회의록·감사결과</b>: 원문 미파싱</li>
         </ul>
       </div>
     </div>
@@ -446,7 +446,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
     <header class="sec-head read">
       <p class="kicker">4 · 기관 특성에 따른 분포</p>
       <h2>기관 수로 본 모습과 인원으로 본 모습이 정반대다.</h2>
-      <p class="intro">‘기타공공기관’은 355개 중 264개로 개수의 74%를 차지한다. 그런데 인원으로는 37%에 그친다. 공기업은 30개뿐인데 임직원의 35%가 여기 몰려 있다. 상위 15개 기관이 전체 임직원의 41%를 가져간다. 중앙값 기관은 266명이다.</p>
+      <p class="intro">‘기타공공기관’은 355개 중 264개로 개수의 74%를 차지한다. 그런데 인원으로는 37%에 그친다. 공기업은 30개뿐인데 임직원의 35%가 여기 몰려 있다. 상위 15개 기관이 전체 임직원의 41%를 가져가는 동안 중앙값 기관은 266명에 머문다.</p>
     </header>
 
     <div class="grid g4">
@@ -503,7 +503,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
       <figure>
         <div class="fig-head"><p class="fig-t">수입 합계와 정부순지원</p><p class="fig-s">348개 기관 합계 · 조원 · 두 계열 모두 같은 축</p></div>
         <div class="plot"><div id="c-fin-ts"></div></div>
-        <figcaption><b>읽는 법</b><span>두 선은 <em>같은 단위·같은 축</em>을 쓴다. 세로 간격이 곧 자체수입 규모다. 간격은 유지되는데 아래 선(정부지원)의 기울기가 더 가파르다. 6년간 수입은 36%, 정부지원은 59% 늘어 <em>정부 의존도가 커졌다</em>. 2021→2022의 큰 점프는 회계 서식 개편일 가능성이 있어 따로 확인해야 한다.</span></figcaption>
+        <figcaption><b>읽는 법</b><span>두 선이 <em>같은 단위·같은 축</em>을 쓰므로 세로 간격이 곧 자체수입 규모가 된다. 간격은 유지되는데 아래 선(정부지원)의 기울기가 더 가파르다. 6년간 수입은 36%, 정부지원은 59% 늘어 <em>정부 의존도가 커졌다</em>. 2021→2022의 큰 점프는 회계 서식 개편일 가능성이 있어 따로 확인해야 한다.</span></figcaption>
       </figure>
     </div>
 
@@ -532,7 +532,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
     <figure>
       <div class="fig-head"><p class="fig-t">임명 spell의 정치성 범주</p><p class="fig-s">n = 11,821 · 정치권·관료·군검경을 합한 ‘연결’ 임원은 4,633건(39.2%)</p></div>
       <div class="plot"><div id="c-label-all"></div></div>
-      <figcaption><b>읽는 법</b><span>범주는 ‘주요경력’ 문구에서 <em>가장 두드러진 이력</em> 하나만 골라 배정했다. 겹침을 허용하지 않는다. 국회의원 보좌관 출신 공무원처럼 두 범주에 걸치는 사람도 한쪽으로만 들어간다. ‘정치권 4.7%’를 <em>정치적 연결의 하한</em>으로 읽어야 하는 이유가 여기 있다.</span></figcaption>
+      <figcaption><b>읽는 법</b><span>범주는 ‘주요경력’ 문구에서 <em>가장 두드러진 이력</em> 하나만 골라 배정했으며 범주 간 겹침을 허용하지 않는다. 국회의원 보좌관 출신 공무원처럼 두 범주에 걸치는 사람도 한쪽으로만 들어간다. ‘정치권 4.7%’를 <em>정치적 연결의 하한</em>으로 읽어야 하는 이유가 여기 있다.</span></figcaption>
     </figure>
 
     <h3 class="blk">직위에 따른 차이</h3>
@@ -540,7 +540,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
     <figure>
       <div class="fig-head"><p class="fig-t">직위별 정치성 구성</p><p class="fig-s">각 막대는 해당 직위 안에서의 100% · 오른쪽 숫자는 spell 수</p></div>
       <div class="plot"><div class="legend" id="lg-1"></div><div id="c-label-pos"></div></div>
-      <figcaption><b>읽는 법</b><span>가로 길이는 <em>비율</em>이다. 인원이 아니다. 맨 위 두 행(감사위원·상임감사)은 표본이 각각 62건, 227건으로 작아 비율이 크게 흔들린다. 오른쪽 숫자를 반드시 함께 볼 것. 아래로 갈수록 표본이 커지며 가장 큰 비상임이사(8,683건)가 전체 평균을 사실상 결정한다.</span></figcaption>
+      <figcaption><b>읽는 법</b><span>가로 길이는 인원이 아니라 <em>비율</em>이다. 맨 위 두 행(감사위원·상임감사)은 표본이 각각 62건, 227건으로 작아 비율이 크게 흔들린다. 오른쪽 숫자를 반드시 함께 볼 것. 아래로 갈수록 표본이 커지며 가장 큰 비상임이사(8,683건)가 전체 평균을 사실상 결정한다.</span></figcaption>
       <details class="tbl"><summary>빈도표로 보기</summary><div class="tblwrap" id="t-label-pos"></div></details>
     </figure>
 
@@ -578,7 +578,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
       <figure>
         <div class="fig-head"><p class="fig-t">여성 임원 비율</p><p class="fig-s">공시 임원행 기준 · % · 2026년은 6월까지</p></div>
         <div class="plot"><div id="c-gender"></div></div>
-        <figcaption><b>읽는 법</b><span>여기서도 세로축은 0에서 시작하지 않는다. 18~23% 구간만 확대했다. 2021년 21.8%에서 2026년 19.1%로 <em>완만히 하락</em>했다. 다만 분모가 공시 임원행이어서 공시 빈도가 높은 기관이 과대 반영된다. 기관당 가중을 두지 않은 수치다.</span></figcaption>
+        <figcaption><b>읽는 법</b><span>여기서도 세로축은 0에서 시작하지 않고 18~23% 구간만 확대했다. 2021년 21.8%에서 2026년 19.1%로 <em>완만히 하락</em>했다. 다만 분모가 공시 임원행이어서 공시 빈도가 높은 기관이 과대 반영된다. 기관당 가중을 두지 않은 수치임에 유의할 것.</span></figcaption>
       </figure>
       <figure>
         <div class="fig-head"><p class="fig-t">연도별 임명 수</p><p class="fig-s">spell의 임명일 기준 · 건</p></div>
@@ -624,7 +624,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
       <figure>
         <div class="fig-head"><p class="fig-t">연도별 계약 총액</p><p class="fig-s">조원 · 2026년은 부분 연도</p></div>
         <div class="plot"><div id="c-ss-amt"></div></div>
-        <figcaption><b>읽는 법</b><span>건수는 정체인데 총액은 6년간 40% 늘었다. <em>건당 금액이 커졌다</em>. 다만 금액은 시트마다 원·천원·백만원 단위가 섞여 있어 셀 숫자서식으로 판정했다. 단위 오판정이 남아 있을 수 있어 총액은 건수보다 신뢰도가 낮다.</span></figcaption>
+        <figcaption><b>읽는 법</b><span>건수는 정체인데 총액이 6년간 40% 늘면서 <em>건당 금액이 그만큼 커졌다</em>. 다만 금액은 시트마다 원·천원·백만원 단위가 섞여 있어 셀 숫자서식으로 판정했다. 단위 오판정이 남아 있을 수 있어 총액은 건수보다 신뢰도가 낮다.</span></figcaption>
       </figure>
     </div>
     <div class="card" style="margin-top:16px">
@@ -648,7 +648,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
       <figure>
         <div class="fig-head"><p class="fig-t">기관유형별 지적</p><p class="fig-s">국회·감사원 누적 레코드 · 절대 건수</p></div>
         <div class="plot"><div class="legend" id="lg-6"></div><div id="c-pf-type"></div></div>
-        <figcaption><b>읽는 법</b><span>이 막대는 <em>비율이 아니라 절대 건수</em>다. 기타공공기관이 가장 긴 이유는 단순하다. 기관이 264개로 많다. 유형끼리 견주려면 기관당 건수로 나눠야 한다. 그렇게 하면 공기업(준시장형)이 가장 높다.</span></figcaption>
+        <figcaption><b>읽는 법</b><span>이 막대는 <em>비율이 아니라 절대 건수</em>다. 기타공공기관 막대가 가장 긴 것은 그 유형에 속한 기관이 264개로 많아서다. 유형끼리 견주려면 기관당 건수로 나눠야 한다. 그렇게 하면 공기업(준시장형)이 가장 높다.</span></figcaption>
       </figure>
     </div>
   </div>
@@ -671,7 +671,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
     </div>
 
     <h3 class="blk">퇴직 임·직원 재취업 <span class="code">3192 · 62개 기관 공시 / 293곳 미공시</span></h3>
-    <p class="blk-note">공시 기관 62곳 중 실제 재취업 사례가 있는 곳은 54곳이다(8곳은 ‘해당사항 없음’). 355개 기관 가운데 54곳만 나타나는 것은 수집 누락 탓이 아니다. <b>자회사를 가진 기관 자체가 적다</b>.</p>
+    <p class="blk-note">공시 기관 62곳 중 실제 재취업 사례가 있는 곳은 54곳이다(8곳은 ‘해당사항 없음’). 355개 기관 가운데 54곳만 나타나는 것은 수집 누락이 아니라 <b>자회사를 가진 기관 자체가 적어서</b>다.</p>
     <div class="grid g2">
       <figure>
         <div class="fig-head"><p class="fig-t">퇴직에서 재취업까지 걸린 기간</p><p class="fig-s">808건 · 퇴직일과 재취업일의 차이</p></div>
