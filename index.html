@@ -370,7 +370,7 @@ footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px sol
     <h3 class="blk">핵심 변수의 기술통계 <span class="code">기관 × 연도 · 2021–2026</span></h3>
     <p class="blk-note">분석에 자주 쓰이는 20개 변수의 분포다. 거의 모든 변수에서 <b>평균이 중앙값의 몇 배</b>로 뛴다. 소수의 대형 기관이 분포를 끌어올린 결과다. 로그 변환이나 기관 고정효과 없이 수준값을 그대로 쓰면 그 소수가 추정치를 지배한다.</p>
     <div class="card"><div class="tblwrap" id="t-core"></div></div>
-    <p class="blk-note" style="margin-top:10px"><b>0값 열</b>을 반드시 확인할 것. ‘소속외인력’은 2,130개 셀 중 1,032개가 0이고, ‘소송건수’는 1,914개 중 840개가 0이다. 이런 변수에서 0은 결측이 아니라 <em>진짜 0</em>이므로, 로그 변환 시 <code>log(1+x)</code>가 필요하고 평균 해석도 달라진다.</p>
+    <p class="blk-note" style="margin-top:10px"><b>0값 열</b>을 반드시 확인할 것. ‘소속외인력’은 2,130개 셀 중 1,032개가 0이다. ‘소송건수’는 1,914개 중 840개가 0이다. 이런 변수에서 0은 결측이 아니라 <em>진짜 0</em>이다. 로그 변환에는 <code>log(1+x)</code>가 필요하고 평균의 뜻도 달라진다.</p>
 
     <h3 class="blk">변수 갈래별로 무엇을 물을 수 있나</h3>
     <div class="grid g2">
