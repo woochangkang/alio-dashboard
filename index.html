@@ -1,0 +1,1020 @@
+<title>공공기관 공시 대장</title>
+<meta name="description" content="ALIO 355개 공공기관 데이터셋 — 원자료의 생산 과정, 추출 변수, 변수별 기술통계와 분포.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* ══ tokens ══ */
+:root{
+  color-scheme:light;
+  --ground:#e9edf0; --ground-2:#dfe5e9; --card:#fafbfc; --card-2:#f1f4f7;
+  --ink:#0f1a21; --ink-2:#4a5b66; --ink-3:#77899a;
+  --rule:#ccd6dd; --rule-2:#dfe6ea; --grid:#e3e9ed;
+  --accent:#0f4c5c; --accent-soft:#dceaee; --accent-ink:#0f4c5c;
+  --s1:#e34948; --s2:#2a78d6; --s3:#eda100; --s4:#008300; --s5:#4a3aa7; --s6:#e87ba4;
+  --shadow:0 1px 0 rgba(15,26,33,.04), 0 1px 3px rgba(15,26,33,.05);
+  --shell:min(1180px, calc(100vw - 44px));
+  --read:min(720px, calc(100vw - 44px));
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0e1519; --ground-2:#131c22; --card:#18212a; --card-2:#1e2831;
+    --ink:#e7eef3; --ink-2:#9cadb9; --ink-3:#6c7e8b;
+    --rule:#2a363f; --rule-2:#212c34; --grid:#222d35;
+    --accent:#6cbcd0; --accent-soft:#14313b; --accent-ink:#8fd0e0;
+    --s1:#e66767; --s2:#3987e5; --s3:#c98500; --s4:#008300; --s5:#9085e9; --s6:#d55181;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 1px 3px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0e1519; --ground-2:#131c22; --card:#18212a; --card-2:#1e2831;
+  --ink:#e7eef3; --ink-2:#9cadb9; --ink-3:#6c7e8b;
+  --rule:#2a363f; --rule-2:#212c34; --grid:#222d35;
+  --accent:#6cbcd0; --accent-soft:#14313b; --accent-ink:#8fd0e0;
+  --s1:#e66767; --s2:#3987e5; --s3:#c98500; --s4:#008300; --s5:#9085e9; --s6:#d55181;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 1px 3px rgba(0,0,0,.35);
+}
+/* 반전 밴드 — 두 테마 모두에서 어두운 판. 계열색은 다크 서피스용 스텝 사용 */
+.band{
+  --card:#182530; --card-2:#1f2e3a; --ground:#101a22;
+  --ink:#e9f0f4; --ink-2:#a3b6c2; --ink-3:#7c8fa0;
+  --rule:#2c3d4a; --rule-2:#243441; --grid:#233340;
+  --accent:#7cc4d6; --accent-soft:#1b3742; --accent-ink:#9ad6e6;
+  --s1:#e66767; --s2:#3987e5; --s3:#c98500; --s4:#00a300; --s5:#9085e9; --s6:#d55181;
+  background:#101a22; color:#e9f0f4;
+}
+:root[data-theme="dark"] .band, :root:not([data-theme="light"]) .band{ background:#070d11; --ground:#070d11 }
+@media (prefers-color-scheme:light){ :root:not([data-theme="dark"]) .band{ background:#101a22; --ground:#101a22 } }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+body{
+  background:var(--ground); color:var(--ink); margin:0;
+  font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  font-size:15px; line-height:1.68; -webkit-font-smoothing:antialiased;
+  /* 한글은 어절 단위로 끊는다 — 기본 break-all 동작이면 단어 중간에서 잘린다 */
+  word-break:keep-all; overflow-wrap:break-word;
+}
+h1,h2,h3,p,li,td,th,figcaption,.lede,.intro{word-break:keep-all; overflow-wrap:break-word}
+h1,h2,h3{font-family:"Gowun Batang","Apple SD Gothic Neo",serif; text-wrap:balance; margin:0; font-weight:700}
+.mono{font-family:"IBM Plex Mono","IBM Plex Sans KR",monospace; font-variant-numeric:tabular-nums}
+a{color:var(--accent-ink)}
+.shell{width:var(--shell); margin:0 auto}
+.read{max-width:var(--read)}
+.skip{position:absolute;left:-9999px;top:0;background:var(--card);color:var(--ink);padding:10px 14px;z-index:99}
+.skip:focus{left:8px;top:8px}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ══ masthead ══ */
+.mast{padding:64px 0 34px}
+.kicker{font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-ink); margin:0}
+.mast h1{font-size:clamp(36px,6vw,60px); line-height:1.1; margin:14px 0 0}
+.mast .lede{color:var(--ink-2); max-width:62ch; margin:18px 0 0; font-size:16.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.chip{font-family:"IBM Plex Mono",monospace;font-size:12px;font-variant-numeric:tabular-nums;
+  border:1px solid var(--rule);background:var(--card);color:var(--ink-2);padding:5px 10px;border-radius:2px}
+.chip b{color:var(--ink);font-weight:600}
+
+/* ══ nav ══ */
+nav{position:sticky;top:0;z-index:40;background:var(--ground);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+nav .shell{display:flex;align-items:center;gap:4px;overflow-x:auto}
+nav a{display:block;padding:11px 13px;text-decoration:none;color:var(--ink-2);font-size:13px;font-weight:500;
+  white-space:nowrap;border-bottom:2px solid transparent}
+nav a:hover{color:var(--ink);border-bottom-color:var(--rule)}
+nav a .n{font-family:"IBM Plex Mono",monospace;color:var(--ink-3);margin-right:6px;font-size:11.5px}
+nav .spacer{flex:1}
+#themeBtn{background:none;border:1px solid var(--rule);color:var(--ink-2);border-radius:2px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;padding:5px 9px;cursor:pointer;margin-left:8px;flex:none}
+#themeBtn:hover{color:var(--ink)}
+
+/* ══ section ══ */
+section{padding:56px 0 8px; scroll-margin-top:52px}
+section.band{padding:60px 0 44px; margin:34px 0}
+.sec-head{margin-bottom:26px}
+.sec-head .kicker{color:var(--accent-ink)}
+.sec-head h2{font-size:clamp(23px,3vw,31px); line-height:1.28; margin:10px 0 0; max-width:24ch}
+.sec-head .intro{color:var(--ink-2);font-size:15px;margin:14px 0 0;max-width:66ch}
+h3.blk{font-size:18px;margin:44px 0 6px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h3.blk .code{font-family:"IBM Plex Mono",monospace;font-size:11.5px;font-weight:500;color:var(--ink-3);letter-spacing:.03em}
+.blk-note{color:var(--ink-2);font-size:14.5px;margin:6px 0 18px;max-width:70ch}
+
+/* ══ figure ══ */
+figure{margin:0; background:var(--card); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--shadow)}
+figure > .fig-head{padding:16px 18px 0}
+.fig-t{font-size:14.5px;font-weight:600;margin:0}
+.fig-s{font-size:12.5px;color:var(--ink-2);margin:3px 0 0}
+figure > .plot{padding:14px 18px 6px; overflow-x:auto}
+figcaption{
+  border-top:1px dashed var(--rule); margin:6px 14px 0; padding:11px 4px 13px;
+  font-size:13px; color:var(--ink-2); display:flex; gap:9px; align-items:flex-start;
+}
+figcaption b{
+  font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--accent-ink); flex:none; padding-top:2px;
+}
+figcaption em{font-style:normal;color:var(--ink)}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 2px}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
+.legend i{width:11px;height:11px;border-radius:2px;display:inline-block;flex:none}
+
+svg{display:block;max-width:100%}
+svg text{font-family:"IBM Plex Sans KR",sans-serif}
+svg .ax{font-family:"IBM Plex Mono",monospace;font-size:10.5px;fill:var(--ink-3)}
+svg .lbl{font-size:11.5px;fill:var(--ink-2)}
+svg .val{font-family:"IBM Plex Mono",monospace;font-size:11px;fill:var(--ink-2)}
+svg .valIn{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500}
+svg .grid-l{stroke:var(--grid);stroke-width:1}
+svg .base-l{stroke:var(--rule);stroke-width:1}
+.hit{cursor:default}
+
+/* ══ grids & cards ══ */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:900px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:18px;box-shadow:var(--shadow)}
+.stat{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:16px;box-shadow:var(--shadow)}
+.stat .lab{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.stat .val{font-size:29px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.18;margin-top:6px}
+.stat .val .u{font-size:14px;font-weight:500;color:var(--ink-2);margin-left:3px}
+.stat .sub{font-size:12.5px;color:var(--ink-2);margin-top:5px}
+
+/* ══ ledger rows ══ */
+.ledger{border-top:1px solid var(--rule)}
+.lrow{display:grid;grid-template-columns:200px 1fr;gap:20px;padding:11px 0;border-bottom:1px solid var(--rule-2);align-items:start}
+.lrow>.k{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3);padding-top:2px}
+.lrow>.v .big{font-size:19px;font-weight:600;font-variant-numeric:tabular-nums}
+.lrow>.v .dim{color:var(--ink-2)}
+@media(max-width:640px){.lrow{grid-template-columns:1fr;gap:2px}}
+
+/* ══ tables ══ */
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{text-align:right;padding:6px 9px;border-bottom:1px solid var(--rule-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;font-variant-numeric:normal;white-space:normal}
+thead th{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;color:var(--ink-3);
+  letter-spacing:.04em;border-bottom:1px solid var(--rule);position:sticky;top:0;background:var(--card)}
+tbody tr:hover{background:var(--card-2)}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--ink)}
+th.sortable::after{content:"";opacity:.4;margin-left:4px}
+th.sortable.asc::after{content:"▲"}
+th.sortable.desc::after{content:"▼"}
+details.tbl{margin:2px 14px 0;border-top:1px solid var(--rule-2);padding:8px 4px 12px}
+details.tbl summary{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);cursor:pointer;letter-spacing:.05em;list-style:none}
+details.tbl summary::-webkit-details-marker{display:none}
+details.tbl summary::before{content:"▸ "}
+details.tbl[open] summary::before{content:"▾ "}
+details.tbl table{margin-top:10px}
+
+/* ══ explorer ══ */
+.exp-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 14px}
+.exp-bar input[type=search], .exp-bar select{
+  font-family:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--rule);
+  border-radius:2px;background:var(--card);color:var(--ink)
+}
+.exp-bar input[type=search]{flex:1;min-width:200px}
+.exp-count{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);margin-left:auto}
+.exp-scroll{max-height:520px;overflow:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card)}
+.exp-scroll td.nm{max-width:280px}
+.exp-scroll td.nm .p{display:block;font-size:11px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.exp-scroll td.cd{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-3)}
+
+/* ══ pipeline ══ */
+.pipe{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0 12px;align-items:stretch}
+.pipe .node{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:15px}
+.pipe .node .h{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:8px}
+.pipe .node ul{margin:0;padding-left:16px;font-size:12.5px;color:var(--ink-2)}
+.pipe .node li{margin:3px 0}
+.pipe .arw{align-self:center;color:var(--ink-3);font-size:18px;font-family:"IBM Plex Mono",monospace}
+@media(max-width:760px){.pipe{grid-template-columns:1fr;gap:8px}.pipe .arw{transform:rotate(90deg);justify-self:center}}
+
+/* ══ notes ══ */
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:14px 16px;border-radius:0 3px 3px 0;font-size:13.5px;margin:20px 0}
+.note.warn{border-left-color:var(--s1);background:color-mix(in srgb, var(--s1) 10%, var(--card))}
+.note .h{font-weight:600;margin-bottom:5px}
+.note ul{margin:6px 0 0;padding-left:18px}
+.note li{margin:4px 0}
+.note code,code{font-family:"IBM Plex Mono",monospace;font-size:12px;background:var(--card);padding:1px 4px;border-radius:2px;border:1px solid var(--rule)}
+
+/* ══ tooltip ══ */
+#tip{position:fixed;z-index:100;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:#182530;color:#e9f0f4;border:1px solid #2c3d4a;border-radius:3px;padding:8px 10px;
+  font-size:12.5px;line-height:1.5;box-shadow:0 6px 18px rgba(0,0,0,.3);max-width:290px}
+#tip .tt{font-weight:600;margin-bottom:3px}
+#tip .tr{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
+#tip .tr i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:6px}
+#tip .tr .tk{color:#a3b6c2}
+
+footer{border-top:1px solid var(--rule);margin-top:60px;padding:26px 0 60px;font-size:13px;color:var(--ink-3)}
+footer p{margin:8px 0}
+footer .dl{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+footer .dl a{font-family:"IBM Plex Mono",monospace;font-size:12px;border:1px solid var(--rule);
+  padding:6px 10px;border-radius:2px;text-decoration:none;background:var(--card)}
+</style>
+
+<a class="skip" href="#main">본문으로 건너뛰기</a>
+
+<header class="mast">
+  <div class="shell">
+    <p class="kicker">ALIO · 공공기관 경영정보 공개시스템 · 2021–2026</p>
+    <h1>공공기관 공시 대장</h1>
+    <p class="lede">355개 공시기관의 자료가 어떻게 생산되었고, 무엇이 변수로 추출되었으며, 그 변수들이 어떤 값을 갖는지 정리한 안내서. 모든 그림에는 읽는 법을 붙였다.</p>
+    <div class="chips">
+      <span class="chip">기관 <b>355</b></span>
+      <span class="chip">원자료 파일 <b>155,999</b></span>
+      <span class="chip">원자료 <b>38.8 GB</b></span>
+      <span class="chip">통계항목 <b>559</b></span>
+      <span class="chip">기술통계 제공 <b>321 변수</b></span>
+      <span class="chip">임명 spell <b>11,821</b></span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="shell">
+    <a href="#raw"><span class="n">1</span>자료의 생산</a>
+    <a href="#vars"><span class="n">2</span>추출 변수</a>
+    <a href="#explorer"><span class="n">3</span>변수 탐색기</a>
+    <a href="#inst"><span class="n">4</span>기관 분포</a>
+    <a href="#officers"><span class="n">5</span>임원 분포</a>
+    <a href="#oversight"><span class="n">6</span>계약·감독</a>
+    <a href="#methods"><span class="n">7</span>생산 과정</a>
+    <span class="spacer"></span>
+    <button id="themeBtn" type="button" aria-label="화면 테마 전환">◐ 테마</button>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ══════════ 1. 자료의 생산 ══════════ -->
+<section id="raw">
+  <div class="shell">
+    <header class="sec-head read">
+      <p class="kicker">1 · 자료의 생산</p>
+      <h2>공시 화면 뒤에는 네 개의 층이 있다.</h2>
+      <p class="intro">ALIO는 하나의 데이터셋이 아니라 서로 다른 방식으로 갱신되는 네 계층의 묶음이다. 기관 마스터가 355개 기관을 정의하고, 통계·보고서·게시판이 각 기관에 붙는다. 파일 수의 92%가 보고서와 게시판에 있으며, 이 둘만이 원문 텍스트를 담고 있다.</p>
+    </header>
+
+    <div class="grid g4">
+      <div class="stat"><div class="lab">organ_detail</div><div class="val">355</div><div class="sub">기관 마스터 JSON · 유형·주무부처·소재지·설립일·기관장</div></div>
+      <div class="stat"><div class="lab">statistics</div><div class="val">559</div><div class="sub">통계항목 JSON · 항목 트리 전수와 기관×연도 값</div></div>
+      <div class="stat"><div class="lab">reports</div><div class="val">62,141</div><div class="sub">정기공시 보고서 HTML · 355기관 × 항목코드</div></div>
+      <div class="stat"><div class="lab">boards</div><div class="val">81,474</div><div class="sub">게시판 레코드 · 9종, 지적·회의록·입찰 등</div></div>
+    </div>
+
+    <h3 class="blk">게시판 9종 <span class="code">data/raw/boards/</span></h3>
+    <p class="blk-note">게시판은 기관이 스스로 올린 공시물의 목록이다. 감독(국회·감사원 지적, 감사결과)과 이사회 운영(회의록, 이사 활동내역)이 대부분을 차지하며, 이 두 축이 감독·거버넌스 분석의 원자료가 된다.</p>
+    <figure>
+      <div class="fig-head"><p class="fig-t">게시판별 수집 레코드 수</p><p class="fig-s">2026년 6월 기준 · 총 81,474건</p></div>
+      <div class="plot"><div id="c-boards"></div></div>
+      <figcaption><b>읽는 법</b><span>막대 길이는 <em>수집된 레코드 수</em>이지 사건의 수가 아니다. 예컨대 ‘국회 지적 22,373’은 국회가 22,373번 지적했다는 뜻이 아니라, 기관들이 그만큼의 공시 항목을 올렸다는 뜻이다. 실제 분석에 쓰는 지적 건수는 중복 제거 후 13,948건이다.</span></figcaption>
+    </figure>
+
+    <h3 class="blk">통계항목 트리 <span class="code">559 항목 · 3 대분류</span></h3>
+    <p class="blk-note">모든 통계항목은 <code>I. 기관운영</code>·<code>II. ESG운영</code>·<code>III. 경영성과</code> 세 갈래 아래 계층 경로를 갖는다. 항목 코드는 <code>GI010101</code> 형태이나 <b>같은 코드가 서식마다 다른 뜻</b>이어서, 실제 키는 <code>서식번호/항목코드</code> 조합이다.</p>
+    <div class="grid g2">
+      <figure>
+        <div class="fig-head"><p class="fig-t">대분류별 항목 수</p><p class="fig-s">전체 559개 항목</p></div>
+        <div class="plot"><div id="c-itemtop"></div></div>
+        <figcaption><b>읽는 법</b><span>기관운영(인사·보수·채용)이 전체의 60%다. 재무 항목은 145개뿐이며 그중 상당수는 회계기준(K-GAAP/IFRS)이나 사업 구분에 따라 <em>일부 기관만 값을 갖는다</em>.</span></figcaption>
+      </figure>
+      <div class="card">
+        <p class="fig-t">패널로 쓸 수 있는 항목의 조건</p>
+        <p class="fig-s" style="margin-bottom:8px">559개 중 실제 분석 가능한 항목은 훨씬 적다</p>
+        <div class="ledger">
+          <div class="lrow"><div class="k">전체 항목</div><div class="v"><span class="big">559</span></div></div>
+          <div class="lrow"><div class="k">scalar (기관×연도 단일값)</div><div class="v"><span class="big">513</span> <span class="dim">— 46개는 다행 구조라 별도 처리</span></div></div>
+          <div class="lrow"><div class="k">값이 하나라도 존재</div><div class="v"><span class="big">396</span> <span class="dim">— 163개는 전 기관 공란</span></div></div>
+          <div class="lrow"><div class="k">30개 기관 이상 보유</div><div class="v"><span class="big">321</span> <span class="dim">— 아래 탐색기의 수록 범위</span></div></div>
+          <div class="lrow"><div class="k">전 기관(≥330) 보유</div><div class="v"><span class="big">143</span> <span class="dim">— 균형패널 후보</span></div></div>
+          <div class="lrow"><div class="k">주요 단위</div><div class="v"><span class="mono">명</span> 115 · <span class="mono">천원</span> 160 · <span class="mono">백만원</span> 95 · <span class="mono">%</span> 13</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <div class="h">연도 창이 자료의 한계를 정한다</div>
+      ALIO는 “최근 5년”만 공개하므로 <b>2021년 이전은 도달할 수 없다</b>. 정기공시의 과거 이력도 서버에 남아 있지 않음을 직접 프로브로 확인했다(<code>scripts/22_probe_quarterly_history.py</code>). 따라서 분기 단위 패널과 2021년 이전 소급은 재수집으로도 해결되지 않는다. 예외는 경영평가 등급으로, 외부 경로를 통해 2008년까지 소급할 수 있다.
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 2. 추출 변수 ══════════ -->
+<section id="vars">
+  <div class="shell">
+    <header class="sec-head read">
+      <p class="kicker">2 · 추출 변수</p>
+      <h2>네 계층이 다섯 갈래의 분석 단위로 접힌다.</h2>
+      <p class="intro">원자료는 그대로 분석에 쓸 수 없다. HTML 표를 파싱하고, 시트마다 다른 금액 단위를 판정하고, 중복 공시를 제거한 뒤에야 관측 단위가 정해진다. 아래는 그 결과 만들어진 산출물과 각 산출물의 관측 단위다.</p>
+    </header>
+
+    <div class="pipe">
+      <div class="node"><div class="h">원자료</div><ul><li>organ_detail JSON</li><li>statistics JSON</li><li>reports HTML</li><li>boards LIST</li></ul></div>
+      <div class="arw">→</div>
+      <div class="node"><div class="h">파싱 · 정규화</div><ul><li>항목 트리 평탄화</li><li>임원표 HTML 파싱</li><li>수의계약 시트 파싱<br>(셀 숫자서식 기반 단위 판정)</li><li>지적 레코드 중복 제거</li></ul></div>
+      <div class="arw">→</div>
+      <div class="node"><div class="h">분석 단위</div><ul><li>기관 — 355</li><li>기관×연도 — 2,130</li><li>임명 spell — 11,821</li><li>계약 — 644,239</li><li>지적 레코드 — 13,948</li></ul></div>
+    </div>
+
+    <h3 class="blk">주요 산출물</h3>
+    <div class="card"><div class="tblwrap" id="t-outputs"></div></div>
+
+    <h3 class="blk">핵심 변수의 기술통계 <span class="code">기관 × 연도 · 2021–2026</span></h3>
+    <p class="blk-note">분석에 자주 쓰이는 20개 변수의 분포다. 거의 모든 변수에서 <b>평균이 중앙값의 몇 배</b>인데, 이는 소수의 대형 기관이 분포를 끌어올리기 때문이다. 로그 변환이나 기관 고정효과 없이 수준값을 그대로 쓰면 이 소수가 추정치를 지배한다.</p>
+    <div class="card"><div class="tblwrap" id="t-core"></div></div>
+    <p class="blk-note" style="margin-top:10px"><b>0값 열</b>을 반드시 확인할 것. ‘소속외인력’은 2,130개 셀 중 1,032개가 0이고, ‘소송건수’는 1,914개 중 840개가 0이다. 이런 변수에서 0은 결측이 아니라 <em>진짜 0</em>이므로, 로그 변환 시 <code>log(1+x)</code>가 필요하고 평균 해석도 달라진다.</p>
+
+    <h3 class="blk">변수 갈래별로 무엇을 물을 수 있나</h3>
+    <div class="grid g2">
+      <div class="card">
+        <p class="fig-t">A. 기관 속성 <span class="mono" style="color:var(--ink-3);font-size:11px">institutions.csv</span></p>
+        <p class="fig-s" style="margin-bottom:8px">시간에 따라 변하지 않는 고정효과 후보</p>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)">
+          <li><b>기관유형</b> 5범주 — 공기업(시장·준시장), 준정부(기금·위탁), 기타공공기관</li>
+          <li><b>주무부처</b> 38개 — 정치적 통제 경로의 대리변수</li>
+          <li><b>소재지</b> 17개 시·도 — 지방이전 정책의 흔적</li>
+          <li><b>설립연도</b> 1905–2025 — 기관 연령</li>
+        </ul>
+      </div>
+      <div class="card">
+        <p class="fig-t">B. 규모·재정 <span class="mono" style="color:var(--ink-3);font-size:11px">panel_statistics_long</span></p>
+        <p class="fig-s" style="margin-bottom:8px">기관×연도 연속변수 · 284개 항목</p>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)">
+          <li><b>임직원</b> — 총계·정원·현원·여성·비정규직·소속외인력</li>
+          <li><b>신규채용</b> — 청년·여성·장애인·지역인재별</li>
+          <li><b>수입/지출/정부순지원</b> — 재정 자립도</li>
+          <li><b>보수</b> — 임원 연봉, 직원 1인당, 신입 초임, 근속</li>
+        </ul>
+      </div>
+      <div class="card">
+        <p class="fig-t">C. 임원 이력 <span class="mono" style="color:var(--ink-3);font-size:11px">officers_*</span></p>
+        <p class="fig-s" style="margin-bottom:8px">기관×공시시점×임원 → 임명 spell로 변환</p>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)">
+          <li><b>임명일·계획 임기·중도이탈</b> 추정</li>
+          <li><b>직위</b> 8종 — 기관장·이사·감사, 상임/비상임</li>
+          <li><b>정치성 라벨</b> 6범주 — 주요경력 LLM 분류</li>
+          <li><b>정권교체 결합</b> — 교체 후 경과일, 12개월 내 임명</li>
+        </ul>
+      </div>
+      <div class="card">
+        <p class="fig-t">D. 계약·감독 <span class="mono" style="color:var(--ink-3);font-size:11px">sole_source_* · point_findings_*</span></p>
+        <p class="fig-s" style="margin-bottom:8px">기관 행위와 외부 감독의 관측치</p>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)">
+          <li><b>수의계약</b> — 계약명·금액·거래처, 644,239건</li>
+          <li><b>거래처 집중도</b> — 최대 거래처 점유율</li>
+          <li><b>국회·감사원 지적</b> — 시행일 기준 13,948 레코드</li>
+          <li><b>이사회 회의록·감사결과</b> — 원문 미파싱</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 3. 탐색기 ══════════ -->
+<section id="explorer">
+  <div class="shell">
+    <header class="sec-head read">
+      <p class="kicker">3 · 변수 탐색기</p>
+      <h2>321개 통계 변수를 직접 열어볼 수 있다.</h2>
+      <p class="intro">30개 이상 기관이 값을 가진 모든 scalar 항목의 기술통계다. 이름·경로·코드로 검색하고, 열 제목을 눌러 정렬한다. 어떤 변수가 실제로 쓸 만한지는 <b>기관 수</b>와 <b>0값 수</b>를 함께 봐야 판단할 수 있다.</p>
+    </header>
+    <div class="exp-bar">
+      <input type="search" id="expQ" placeholder="변수명·경로·코드 검색 (예: 신규채용, 부채, GI03)" aria-label="변수 검색">
+      <select id="expTop" aria-label="대분류 필터"><option value="">대분류 전체</option></select>
+      <select id="expUnit" aria-label="단위 필터"><option value="">단위 전체</option></select>
+      <span class="exp-count" id="expCount"></span>
+    </div>
+    <div class="exp-scroll"><table id="expTable"><thead></thead><tbody></tbody></table></div>
+    <figcaption style="margin-left:0;margin-right:0;border-top:none;padding-top:12px">
+      <b>읽는 법</b>
+      <span><em>n</em>은 기관×연도 셀 수(최대 2,130), <em>기관</em>은 값을 가진 고유 기관 수, <em>0값</em>은 0으로 기록된 셀 수다. 기관 수가 355에 가까울수록 균형패널에 가깝고, 0값 비중이 높으면 그 변수는 사실상 이항(있음/없음) 변수에 가깝다. <em>p50</em>과 <em>평균</em>의 차이가 크면 소수 대형 기관이 끌어올린 것이다.</span>
+    </figcaption>
+  </div>
+</section>
+
+<!-- ══════════ 4. 기관 분포 ══════════ -->
+<section id="inst">
+  <div class="shell">
+    <header class="sec-head read">
+      <p class="kicker">4 · 기관 특성에 따른 분포</p>
+      <h2>기관 수로 본 모습과 인원으로 본 모습이 정반대다.</h2>
+      <p class="intro">‘기타공공기관’이 355개 중 264개로 개수의 74%를 차지하지만, 인원으로는 37%에 그친다. 반대로 공기업은 30개뿐인데 임직원의 35%가 여기 있다. 상위 15개 기관이 전체 임직원의 41%를 차지하는 반면 중앙값 기관은 266명이다.</p>
+    </header>
+
+    <div class="grid g4">
+      <div class="stat"><div class="lab">임직원 총계 · 2026</div><div class="val">431,805<span class="u">명</span></div><div class="sub">355개 기관 합계</div></div>
+      <div class="stat"><div class="lab">중앙값 기관 규모</div><div class="val">266<span class="u">명</span></div><div class="sub">상위 1%는 13,122명</div></div>
+      <div class="stat"><div class="lab">수입 합계 · 2026</div><div class="val">910<span class="u">조원</span></div><div class="sub">2021년 670조원 → +36%</div></div>
+      <div class="stat"><div class="lab">정부순지원 · 2026</div><div class="val">142<span class="u">조원</span></div><div class="sub">2021년 89조원 → +59%</div></div>
+    </div>
+
+    <h3 class="blk">유형과 부처</h3>
+    <div class="grid g2">
+      <figure>
+        <div class="fig-head"><p class="fig-t">기관유형별 기관 수와 인원</p><p class="fig-s">위 막대 = 기관 수 · 아래 막대 = 2026년 임직원 합계</p></div>
+        <div class="plot"><div id="c-type"></div></div>
+        <figcaption><b>읽는 법</b><span>두 막대는 <em>서로 다른 척도</em>다(각각 자기 최대값을 기준으로 그렸다). 같은 행에서 위·아래 길이를 직접 비교하지 말고, <em>행 사이</em>의 상대 길이만 비교할 것. 기타공공기관은 위 막대가 가장 길지만 아래 막대는 그렇지 않다 — 이것이 개수와 규모의 불일치다.</span></figcaption>
+        <details class="tbl"><summary>기관당 중앙값까지 표로 보기</summary><div class="tblwrap" id="t-type"></div></details>
+      </figure>
+      <figure>
+        <div class="fig-head"><p class="fig-t">주무부처별 기관 수</p><p class="fig-s">38개 부처 중 상위 14개 · 나머지 24개는 각 6개 이하</p></div>
+        <div class="plot"><div id="c-ministry"></div></div>
+        <figcaption><b>읽는 법</b><span>주무부처는 예산·인사·평가의 통제 경로다. 상위 5개 부처가 156개 기관(44%)을 관할하므로, 부처 고정효과를 넣으면 표본이 빠르게 얇아진다. 24개 부처는 기관이 6개 이하라 <em>부처 단위 추정이 사실상 불가능</em>하다.</span></figcaption>
+      </figure>
+    </div>
+
+    <h3 class="blk">공간 분포 <span class="code">addrCd · 17개 시·도</span></h3>
+    <figure>
+      <div class="fig-head"><p class="fig-t">시·도별 기관 수와 임직원</p><p class="fig-s">위 막대 = 기관 수 · 아래 막대 = 2026년 임직원 합계 · 임직원 내림차순</p></div>
+      <div class="plot"><div id="c-region"></div></div>
+      <figcaption><b>읽는 법</b><span>여기서도 두 막대는 척도가 다르다. 주목할 것은 <em>두 막대의 길이가 어긋나는 행</em>이다 — 서울은 기관 130개에 인원 69,847명이지만, 대전은 기관 26개에 66,727명이다. 2010년대 지방이전으로 <em>대형 기관은 지방에, 소형 기관은 서울에</em> 남은 구조가 그대로 보인다. 세종은 26개 기관에 7,148명으로 ‘소형 다수’의 극단이다.</span></figcaption>
+      <details class="tbl"><summary>기관당 평균까지 표로 보기</summary><div class="tblwrap" id="t-region"></div></details>
+    </figure>
+
+    <h3 class="blk">설립 시기와 재정 자립도</h3>
+    <div class="grid g2">
+      <figure>
+        <div class="fig-head"><p class="fig-t">설립연도 분포</p><p class="fig-s">원자료 <code>organ_detail</code>에서 재구성 · 355개 기관</p></div>
+        <div class="plot"><div id="c-founded"></div></div>
+        <figcaption><b>읽는 법</b><span>2000년대에 설립된 기관이 102개로 가장 많다. 공공기관 운영에 관한 법률(2007) 전후로 신설이 몰려 있어, <em>기관 연령은 제도 도입 시점과 뒤섞여 있다</em>. 최고령은 1905년, 최신은 2025년.</span></figcaption>
+      </figure>
+      <figure>
+        <div class="fig-head"><p class="fig-t">정부순지원이 수입에서 차지하는 비중</p><p class="fig-s">2026년 · 기관유형별 중앙값 · %</p></div>
+        <div class="plot"><div id="c-govshare"></div></div>
+        <figcaption><b>읽는 법</b><span>이 한 변수가 기관유형의 실질적 정의에 가깝다. 공기업 두 유형은 중앙값이 <em>정확히 0%</em>로, 정부 지원 없이 자체 수입으로 운영된다. 반면 위탁집행형(76%)과 기타공공기관(73%)은 예산의 대부분이 정부에서 온다 — 재정 통제의 강도가 유형별로 질적으로 다르다는 뜻이다.</span></figcaption>
+      </figure>
+    </div>
+
+    <h3 class="blk">시계열 <span class="code">2021–2026</span></h3>
+    <div class="grid g2">
+      <figure>
+        <div class="fig-head"><p class="fig-t">임직원 총계</p><p class="fig-s">355개 기관 합계 · 명</p></div>
+        <div class="plot"><div id="c-emp-ts"></div></div>
+        <figcaption><b>읽는 법</b><span>세로축이 <em>0에서 시작하지 않는다</em>(42만~43만 구간을 확대). 변동폭이 2.3%에 불과해 0부터 그리면 평평한 직선이 되기 때문이다. 확대된 축이므로 <em>기울기를 과대 해석하지 말 것</em> — 실질적으로는 6년간 정체다.</span></figcaption>
+      </figure>
+      <figure>
+        <div class="fig-head"><p class="fig-t">수입 합계와 정부순지원</p><p class="fig-s">348개 기관 합계 · 조원 · 두 계열 모두 같은 축</p></div>
+        <div class="plot"><div id="c-fin-ts"></div></div>
+        <figcaption><b>읽는 법</b><span>두 선이 <em>같은 단위·같은 축</em>이라 세로 간격이 곧 자체수입 규모다. 간격은 유지되는데 아래 선(정부지원)이 더 가파르다 — 6년간 수입은 36%, 정부지원은 59% 늘어 <em>정부 의존도가 커졌다</em>. 2021→2022의 큰 점프는 회계 서식 개편 가능성이 있어 별도 확인이 필요하다.</span></figcaption>
+      </figure>
+    </div>
+
+    <h3 class="blk">규모 상위 기관 <span class="code">2026 · 임직원 총계</span></h3>
+    <div class="card"><div class="tblwrap" id="t-topemp"></div></div>
+  </div>
+</section>
+
+<!-- ══════════ 5. 임원 (밴드) ══════════ -->
+<section id="officers" class="band">
+  <div class="shell">
+    <header class="sec-head read">
+      <p class="kicker">5 · 임원의 카테고리별 분포</p>
+      <h2>정치권 출신은 5%지만, 어느 자리에 앉는지가 다르다.</h2>
+      <p class="intro">임원현황 공시 7,026개 시점을 이어붙여 임명 spell 11,821건을 복원하고, 각 임원의 ‘주요경력’ 문구를 6개 범주로 분류했다. 전체 중 정치권 출신은 4.7%에 그치지만, 상임감사에서는 30.8%다. 아래 수치는 모두 <b>사람 코딩 검증 전의 잠정값</b>이다.</p>
+    </header>
+
+    <div class="grid g4">
+      <div class="stat"><div class="lab">임명 spell</div><div class="val">11,821</div><div class="sub">346개 기관 · 분류 대상 고유 임원 11,124명</div></div>
+      <div class="stat"><div class="lab">정치권 출신</div><div class="val">4.7<span class="u">%</span></div><div class="sub">spell 기준 558건 · 잠정</div></div>
+      <div class="stat"><div class="lab">여성 임원</div><div class="val">20.8<span class="u">%</span></div><div class="sub">공시 임원행 82,791건 기준</div></div>
+      <div class="stat"><div class="lab">중도이탈 추정</div><div class="val">7.9<span class="u">%</span></div><div class="sub">932 / 11,821 spell</div></div>
+    </div>
+
+    <h3 class="blk">여섯 범주</h3>
+    <figure>
+      <div class="fig-head"><p class="fig-t">임명 spell의 정치성 범주</p><p class="fig-s">n = 11,821 · 정치권·관료·군검경을 합한 ‘연결’ 임원은 4,633건(39.2%)</p></div>
+      <div class="plot"><div id="c-label-all"></div></div>
+      <figcaption><b>읽는 법</b><span>범주는 ‘주요경력’ 문구에서 <em>가장 두드러진 이력</em> 하나로 배정한 것이라 겹침을 허용하지 않는다. 국회의원 보좌관 출신 공무원처럼 두 범주에 걸치는 사람은 한쪽으로만 들어간다. 따라서 ‘정치권 4.7%’는 <em>정치적 연결의 하한</em>으로 읽어야 한다.</span></figcaption>
+    </figure>
+
+    <h3 class="blk">직위에 따른 차이</h3>
+    <p class="blk-note">이 자료에서 가장 뚜렷한 패턴이다. 비상임이사의 정치권 비율은 3.3%지만 상임감사는 30.8%, 상임이사(감사위원)는 38.7%다. 반대로 상임이사는 내부승진이 54%로 조직 내부 경로가 지배한다.</p>
+    <figure>
+      <div class="fig-head"><p class="fig-t">직위별 정치성 구성</p><p class="fig-s">각 막대는 해당 직위 안에서의 100% · 오른쪽 숫자는 spell 수</p></div>
+      <div class="plot"><div class="legend" id="lg-1"></div><div id="c-label-pos"></div></div>
+      <figcaption><b>읽는 법</b><span>가로 길이는 <em>비율</em>이지 인원이 아니다. 맨 위 두 행(감사위원·상임감사)은 표본이 각각 62건, 227건으로 작아 비율이 크게 흔들릴 수 있다 — 오른쪽 숫자를 반드시 함께 볼 것. 아래로 갈수록 표본이 커지고, 가장 큰 비상임이사(8,683건)가 전체 평균을 사실상 결정한다.</span></figcaption>
+      <details class="tbl"><summary>빈도표로 보기</summary><div class="tblwrap" id="t-label-pos"></div></details>
+    </figure>
+
+    <h3 class="blk">기관유형과 시간에 따른 차이</h3>
+    <div class="grid g2">
+      <figure>
+        <div class="fig-head"><p class="fig-t">기관유형별 정치성 구성</p><p class="fig-s">각 막대는 해당 유형 안에서의 100%</p></div>
+        <div class="plot"><div class="legend" id="lg-2"></div><div id="c-label-type"></div></div>
+        <figcaption><b>읽는 법</b><span>위에서 아래로 <em>기관 규모가 큰 유형부터</em> 배열했다. 공기업(시장형)의 정치권 14.3%는 기타공공기관 3.4%의 네 배가 넘는다. 동시에 공기업은 내부승진(27%)도 높아, 정치적 경로와 내부 경로가 <em>함께</em> 강한 이중구조를 보인다.</span></figcaption>
+        <details class="tbl"><summary>빈도표로 보기</summary><div class="tblwrap" id="t-label-type"></div></details>
+      </figure>
+      <figure>
+        <div class="fig-head"><p class="fig-t">임명연도별 정치성 구성</p><p class="fig-s">각 기둥은 해당 연도 임명의 100% · 기둥 위 숫자는 spell 수</p></div>
+        <div class="plot"><div class="legend" id="lg-3"></div><div id="c-label-year"></div></div>
+        <figcaption><b>읽는 법</b><span>관료 비율이 2018년 13%에서 2025년 46%로 오르지만 <em>이것을 추세로 읽으면 안 된다</em>. 관측 창이 2021년 공시부터라, 2018–2020년 임명 중에는 <em>오래 재직한 사람만</em> 표본에 남는다(좌측절단). 초기 연도의 구성은 실제 임명 구성이 아니라 생존한 임명의 구성이다. 2026년은 부분 연도다.</span></figcaption>
+        <details class="tbl"><summary>빈도표로 보기</summary><div class="tblwrap" id="t-label-year"></div></details>
+      </figure>
+    </div>
+
+    <h3 class="blk">임기 구조</h3>
+    <div class="grid g2">
+      <figure>
+        <div class="fig-head"><p class="fig-t">계획 임기의 길이</p><p class="fig-s">임명일과 임기종료 계획일의 차이 · spell 11,821건</p></div>
+        <div class="plot"><div id="c-tenure"></div></div>
+        <figcaption><b>읽는 법</b><span>2년과 3년 두 봉우리로 갈린다. 공공기관운영법이 <em>기관장·감사는 3년, 이사는 2년</em>으로 정한 결과다. ‘미기재’ 3,302건(28%)이 커 보이지만, 이는 대개 임기종료일 칸이 비어 있는 공시로 결측이지 임기가 없다는 뜻이 아니다. 6년(119건)은 연임이 하나의 spell로 합쳐진 경우로 보인다.</span></figcaption>
+      </figure>
+      <figure>
+        <div class="fig-head"><p class="fig-t">범주별 중도이탈 추정 비율</p><p class="fig-s">계획 임기 만료 전 이탈로 추정된 spell 비율 · 막대 끝은 이탈/전체</p></div>
+        <div class="plot"><div id="c-midexit"></div></div>
+        <figcaption><b>읽는 법</b><span>‘중도이탈’은 관측된 사실이 아니라 <em>추정</em>이다 — 공시 스냅샷 사이에서 사라진 시점과 계획 임기를 비교해 구간 검열(interval censoring)로 판정한다. 따라서 공시 주기가 성긴 기관일수록 판정이 부정확하다. 범주 간 차이(군검경 16.0% vs 관료 4.7%)는 표본 크기 차이가 커서 그대로 비교하기 어렵다.</span></figcaption>
+      </figure>
+    </div>
+
+    <div class="grid g2">
+      <figure>
+        <div class="fig-head"><p class="fig-t">여성 임원 비율</p><p class="fig-s">공시 임원행 기준 · % · 2026년은 6월까지</p></div>
+        <div class="plot"><div id="c-gender"></div></div>
+        <figcaption><b>읽는 법</b><span>세로축이 0에서 시작하지 않는다(18~23% 구간 확대). 2021년 21.8%에서 2026년 19.1%로 <em>완만히 하락</em>했다. 다만 분모가 공시 임원행이라 공시 빈도가 높은 기관이 과대 반영된다 — 기관당 가중 없는 수치다.</span></figcaption>
+      </figure>
+      <figure>
+        <div class="fig-head"><p class="fig-t">연도별 임명 수</p><p class="fig-s">spell의 임명일 기준 · 건</p></div>
+        <div class="plot"><div id="c-appt"></div></div>
+        <figcaption><b>읽는 법</b><span>2018–2020년의 낮은 값은 임명이 적었던 것이 아니라 <em>관측 창 밖에서 이미 끝난 임명이 빠졌기 때문</em>이다. 2021년 이후가 실제 임명 흐름에 가깝다. 2026년(869건)은 6월까지의 부분 연도다.</span></figcaption>
+      </figure>
+    </div>
+
+    <div class="note warn">
+      <div class="h">임원 데이터를 쓸 때의 세 가지 제약</div>
+      <ul>
+        <li><b>분류 검증 미완</b> — 6범주 라벨은 LLM 배치 분류(<code>claude-haiku-4-5</code>) 결과이며 골드샘플 150건 사람 코딩이 대기 중이다. F1·혼동행렬이 확정되기 전까지 모든 비율은 잠정값이다.</li>
+        <li><b>좌측절단</b> — 관측 창은 2021년 공시부터 시작하므로 그 이전에 임명되어 이미 종료된 spell은 보이지 않는다. 임명연도가 이를수록 ‘오래 재직한 사람’으로 편향된다.</li>
+        <li><b>정권교체일 1건이 추정값</b> — <code>2025-06-04</code>는 확정 전 추정으로 코딩되어 있고 spell 1,237건이 이 값에 묶여 있다. 확정 시 전 분석 재실행이 필요하다.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 6. 계약·감독 ══════════ -->
+<section id="oversight">
+  <div class="shell">
+    <header class="sec-head read">
+      <p class="kicker">6 · 계약과 감독</p>
+      <h2>기관이 한 일과 외부가 지적한 일.</h2>
+      <p class="intro">수의계약 64만 건은 기관의 재량적 지출을, 국회·감사원 지적 1.4만 건은 외부 감독의 강도를 각각 관측한다. 두 계열 모두 기관×연도로 접을 수 있어 패널 분석의 종속변수가 된다.</p>
+    </header>
+
+    <div class="grid g4">
+      <div class="stat"><div class="lab">수의계약</div><div class="val">644,239<span class="u">건</span></div><div class="sub">347개 기관 · 2021–2026</div></div>
+      <div class="stat"><div class="lab">연 계약 총액</div><div class="val">17–24<span class="u">조원</span></div><div class="sub">계약 중앙값 1,755만원</div></div>
+      <div class="stat"><div class="lab">국회 지적</div><div class="val">10,801</div><div class="sub">레코드 · 시행연도 기준</div></div>
+      <div class="stat"><div class="lab">감사원 지적</div><div class="val">3,147</div><div class="sub">레코드 · 시행연도 기준</div></div>
+    </div>
+
+    <h3 class="blk">수의계약</h3>
+    <div class="grid g2">
+      <figure>
+        <div class="fig-head"><p class="fig-t">연도별 계약 건수</p><p class="fig-s">건 · 2026년은 부분 연도</p></div>
+        <div class="plot"><div id="c-ss-n"></div></div>
+        <figcaption><b>읽는 법</b><span>2021–2025년은 12만 건대로 안정적이다. 2026년 29,337건은 <em>감소가 아니라 부분 연도</em>(직전 해의 23%)이므로 추세선으로 이으면 안 된다.</span></figcaption>
+      </figure>
+      <figure>
+        <div class="fig-head"><p class="fig-t">연도별 계약 총액</p><p class="fig-s">조원 · 2026년은 부분 연도</p></div>
+        <div class="plot"><div id="c-ss-amt"></div></div>
+        <figcaption><b>읽는 법</b><span>건수는 정체인데 총액은 6년간 40% 늘었다 — <em>건당 금액이 커진 것</em>이다. 다만 금액은 시트마다 원·천원·백만원 단위가 섞여 있어 셀 숫자서식으로 판정했다. 단위 오판정이 남아 있을 수 있으므로 총액은 건수보다 신뢰도가 낮다.</span></figcaption>
+      </figure>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <p class="fig-t">기관유형별 수의계약</p><p class="fig-s" style="margin-bottom:10px">2021–2026 누적 · 14개 시장형 공기업이 총액의 52%를 차지한다</p>
+      <div class="tblwrap" id="t-ss-type"></div>
+    </div>
+
+    <h3 class="blk">감독 지적</h3>
+    <figure>
+      <div class="fig-head"><p class="fig-t">시행연도별 지적 레코드</p><p class="fig-s">n = 13,948 · 국회 10,801 + 감사원 3,147</p></div>
+      <div class="plot"><div class="legend" id="lg-5"></div><div id="c-pf-year"></div></div>
+      <figcaption><b>읽는 법</b><span>2020년 이전이 거의 비어 있는 것은 <em>감독이 없었기 때문이 아니라 게시판 축적이 그때 시작됐기 때문</em>이다. 시행연도는 2004년까지 거슬러 올라가지만 실질 분석 창은 2021–2025로 두는 것이 안전하다. 2026년은 부분 연도다. 국회 지적이 감사원의 3.4배인 것은 감독 강도가 아니라 <em>공시 관행의 차이</em>일 수 있다.</span></figcaption>
+      <details class="tbl"><summary>표로 보기</summary><div class="tblwrap" id="t-pf-year"></div></details>
+    </figure>
+    <div class="grid g2" style="margin-top:16px">
+      <figure>
+        <div class="fig-head"><p class="fig-t">지적이 많은 기관</p><p class="fig-s">상위 12개 · 누적 레코드 수</p></div>
+        <div class="plot"><div id="c-pf-top"></div></div>
+        <figcaption><b>읽는 법</b><span>상위권은 거의 전부 초대형 기관이다 — 지적 건수는 <em>부실의 크기가 아니라 기관 규모와 사업 수</em>를 먼저 반영한다. 분석에서는 임직원 수나 예산으로 정규화하거나, 기관 고정효과를 넣어야 한다.</span></figcaption>
+      </figure>
+      <figure>
+        <div class="fig-head"><p class="fig-t">기관유형별 지적</p><p class="fig-s">국회·감사원 누적 레코드 · 절대 건수</p></div>
+        <div class="plot"><div class="legend" id="lg-6"></div><div id="c-pf-type"></div></div>
+        <figcaption><b>읽는 법</b><span>이 막대는 <em>비율이 아니라 절대 건수</em>다. 기타공공기관이 가장 긴 것은 기관 수가 264개로 많기 때문이다. 유형 간 비교를 하려면 기관당 건수로 나눠야 한다 — 그렇게 하면 공기업(준시장형)이 가장 높다.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 7. 생산 과정 ══════════ -->
+<section id="methods">
+  <div class="shell">
+    <header class="sec-head read">
+      <p class="kicker">7 · 생산 과정</p>
+      <h2>이 숫자들이 어떻게 만들어졌는가.</h2>
+      <p class="intro">수집·파싱·분류의 각 단계에서 내린 판단과, 그 판단이 남긴 한계를 밝힌다. 재현에 필요한 스크립트 이름을 함께 적었다.</p>
+    </header>
+
+    <div class="grid g2">
+      <div class="card">
+        <p class="fig-t">1. 수집</p>
+        <p style="font-size:13.5px;color:var(--ink-2);margin:8px 0 0">ALIO 내부 API를 <code>alio_client.py</code>로 호출했다. 요청 간격 제한·재시도·체크포인트·매니페스트를 두어 중단 후 재개가 가능하다. 기관 목록(<code>00_fetch_master</code>) → 통계(<code>01_fetch_statistics</code>) → 보고서(<code>02_fetch_reports</code>) → 임원 전 시점(<code>02c_fetch_officers_20305_history</code>) → 게시판(<code>03_fetch_boards</code>) 순.</p>
+      </div>
+      <div class="card">
+        <p class="fig-t">2. 임원표 파싱</p>
+        <p style="font-size:13.5px;color:var(--ink-2);margin:8px 0 0">공시 HTML의 임원 표를 기관×공시시점×임원 행으로 펼친 뒤(<code>04b_parse_officers_history</code>), 같은 사람이 연속 등장하는 구간을 하나의 임명 spell로 묶었다(<code>05_build_officer_spells</code>). 퇴임 시점은 스냅샷 사이에 있어 <b>구간 검열</b>로만 알 수 있다.</p>
+      </div>
+      <div class="card">
+        <p class="fig-t">3. 정치성 분류</p>
+        <p style="font-size:13.5px;color:var(--ink-2);margin:8px 0 0">‘주요경력’ 문구를 <code>claude-haiku-4-5-20251001</code> 배치 API로 6범주 분류했다(<code>07_classify_officers</code>). 프롬프트 전문과 개별 응답을 모두 보존했다. <b>골드샘플 150건의 사람 코딩이 대기 중</b>이며, F1·혼동행렬이 나오기 전까지 라벨 기반 수치는 잠정이다.</p>
+      </div>
+      <div class="card">
+        <p class="fig-t">4. 수의계약 단위 판정</p>
+        <p style="font-size:13.5px;color:var(--ink-2);margin:8px 0 0">기관마다 금액 단위(원·천원·백만원)가 달라, 값의 크기로 단위를 추정하는 방식은 실패했다. 최종적으로 <b>엑셀 셀의 숫자 서식</b>(<code>#,##0,</code> 등)을 읽어 판정했다(<code>31_parse_sole_source_7030.py</code> v3). 합계행·빈 계약명을 제거하고 중복 키를 정교화해 644,239행을 얻었다.</p>
+      </div>
+      <div class="card">
+        <p class="fig-t">5. 지적 레코드 정리</p>
+        <p style="font-size:13.5px;color:var(--ink-2);margin:8px 0 0">국회·감사원 게시판을 공시번호로 1차 중복 제거하고, 같은 기관·같은 시행일·같은 제목을 2차로 합쳤다(<code>31_parse_point_findings.py</code>). 단위는 ‘지적 <b>공시 레코드</b>’이며 1행 = 1건이 항상 성립하지는 않는다.</p>
+      </div>
+      <div class="card">
+        <p class="fig-t">6. 교차 검증</p>
+        <p style="font-size:13.5px;color:var(--ink-2);margin:8px 0 0">주요 산출물은 별도 도구(OpenAI Codex CLI, 읽기 전용)로 적대적 검증을 3라운드 거쳤다. 이 과정에서 파싱 오류 5종과 시점 오정렬 1건을 적발했고, <b>자체 분석 결과 1건을 철회</b>했다. 검증 이력은 프로젝트 보고서 부록에 전부 남겼다.</p>
+      </div>
+    </div>
+
+    <h3 class="blk">알려진 문제</h3>
+    <div class="grid g2">
+      <div class="note warn" style="margin:0">
+        <div class="h">처리 오류 1건 — 설립일</div>
+        <code>institutions.csv</code>의 <code>fdate</code>가 355개 전부 1970년으로 깨져 있다. 원자료 <code>organ_detail/*.json</code>에는 <code>19870730</code> 형식으로 정상 기록되어 있으므로, 설립연도가 필요하면 원자료에서 다시 만들어야 한다. 이 페이지의 설립연도 분포는 원자료에서 재구성한 값이다.
+      </div>
+      <div class="note" style="margin:0">
+        <div class="h">부분 연도</div>
+        2026년 관측치는 모두 연중 일부다 — 임원 공시는 6월 13일까지, 수의계약은 직전 해의 23%, 지적은 71건에 그친다. 연도별 비교에서 2026년을 온전한 한 해로 취급하면 안 된다.
+      </div>
+      <div class="note" style="margin:0">
+        <div class="h">공통 충격을 제거할 수 없다</div>
+        관측 창 안의 정권교체는 2022-05-10과 2025-06-04(추정) 두 번뿐이다. 교체 시점이 전 기관에 동시에 적용되므로 연도 고정효과와 분리되지 않는다. 이 자료로 얻은 교체 전후 비교는 <b>기술적 상관</b>으로 읽어야 한다.
+      </div>
+      <div class="note" style="margin:0">
+        <div class="h">아직 열지 않은 원자료</div>
+        수집은 되었으나 파싱하지 않은 자료가 남아 있다 — 퇴직자 재취업(<code>3192</code>), 징계(<code>2121</code>), 그리고 이사회 회의록 13,789건·감사결과 20,609건의 본문. 회전문과 이사회 심의를 직접 측정하려면 이쪽이 다음 순서다.
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="shell">
+    <p><b>산출 근거</b> — 이 페이지의 모든 수치는 2026-09-01에 <code>data/processed/</code>와 <code>data/raw/</code>를 직접 집계해 산출했다. 회귀 추정 결과는 포함하지 않는다. 개인 식별 정보(임원 성명, 개별 분류 라벨)는 공개하지 않으며 집계값만 싣는다.</p>
+    <div class="dl">
+      <a href="data/item_descriptives.csv" download>↓ 변수 기술통계 CSV (321행)</a>
+      <a href="data/site_data.json" download>↓ 이 페이지의 전체 집계 JSON</a>
+    </div>
+    <p class="mono" style="font-size:11.5px">검증 대조 — 기관 355 · 임명 spell 11,821 · 분류 대상 임원 11,124 · 수의계약 644,239 · 지적 레코드 13,948 · 통계패널 459,417행 · 탐색기 수록 321 변수.</p>
+    <p style="font-size:12px">출처: <a href="https://www.alio.go.kr">ALIO 공공기관 경영정보 공개시스템</a> · 원자료는 공공 공시자료이며 재배포하지 않는다.</p>
+  </div>
+</footer>
+
+<div id="tip" role="status" aria-live="polite"></div>
+<script id="alio-data" type="application/json">{"LB":["정치권","관료","군검경","내부승진","민간전문가","기타"],"boardLabels":{"국회 지적 (point_national)":22373,"감사결과 (board_audit_result)":20609,"이사회 회의록 (board_directors_minutes)":13789,"감사원 지적 (point_audit)":8255,"이사 활동내역 (board_director_activity)":7837,"임원 공고 (officer)":7293,"입찰 (bid)":782,"내부규정 (rule)":421,"연구보고서 (research)":115},"item_top_counts":{"I. 기관운영":333,"III. 경영성과":145,"II. ESG운영":81},"outputs":[["institutions.csv","기관","355","—","유형·주무부처·소재지·기관장"],["panel_statistics_long.csv","기관 × 항목 × 연도","459,417","2021–2026","284개 통계항목 long 포맷"],["officers_20305_panel_long.csv","기관 × 공시시점 × 임원","82,791","2021–2026","7,026개 공시 스냅샷"],["officers_20305_spells.csv","임명 spell","11,821","2001–2026","임명일·계획 임기·중도이탈·정권교체"],["officers_political_classification.csv","고유 임원","11,124","—","주요경력 6범주 LLM 분류"],["officers_20305_changes_all.csv","교체 이벤트","11,473","2021–2026","변경 전/후 성명·사유"],["sole_source_contracts.csv","계약","644,239","2021–2026","계약명·금액·거래처"],["sole_source_panel.csv","기관 × 연도","2,030","2021–2026","건수·총액·거래처 집중도"],["point_findings_long.csv","지적 공시 레코드","13,948","2004–2026","국회 10,801 · 감사원 3,147"],["d3_board_counts_panel.csv","기관 × 연도","2,415","2004–2026","게시판 4종 건수"]],"core":[{"key":"20201/GI03","label":"임직원 총계","grp":"규모","unit":"명","n":2130.0,"ninst":355.0,"nzero":21.0,"mean":1201.49,"sd":2887.24,"min":0.0,"p25":117.0,"p50":260.0,"p75":858.5,"p90":2973.55,"max":32957.0},{"key":"20201/GI02010201","label":"정규직 현원(계)","grp":"규모","unit":"명","n":2130.0,"ninst":355.0,"nzero":23.0,"mean":970.54,"sd":2639.46,"min":0.0,"p25":75.19,"p50":167.5,"p75":613.75,"p90":2624.43,"max":32032.53},{"key":"20201/GI0401","label":"여성 현원(합계)","grp":"규모","unit":"명","n":2130.0,"ninst":355.0,"nzero":21.0,"mean":449.02,"sd":1081.98,"min":0.0,"p25":49.1,"p50":101.94,"p75":292.58,"p90":1051.0,"max":10892.0},{"key":"20201/GI050103","label":"기간제 비정규직(계)","grp":"규모","unit":"명","n":2130.0,"ninst":355.0,"nzero":110.0,"mean":62.64,"sd":124.77,"min":0.0,"p25":7.0,"p50":18.5,"p75":60.0,"p90":161.72,"max":1225.0},{"key":"20201/GI050304","label":"소속외인력(계)","grp":"규모","unit":"명","n":2130.0,"ninst":355.0,"nzero":1032.0,"mean":80.88,"sd":382.59,"min":0.0,"p25":0.0,"p50":1.0,"p75":19.0,"p90":124.1,"max":6255.0},{"key":"20201/GI0105","label":"상임임원 정원 계","grp":"규모","unit":"명","n":2130.0,"ninst":355.0,"nzero":112.0,"mean":2.39,"sd":1.96,"min":0.0,"p25":1.0,"p50":2.0,"p75":4.0,"p90":5.0,"max":13.0},{"key":"20401/GI010201","label":"일반정규직 신규채용","grp":"채용","unit":"명","n":2130.0,"ninst":355.0,"nzero":264.0,"mean":57.84,"sd":164.47,"min":0.0,"p25":3.0,"p50":11.0,"p75":34.0,"p90":136.2,"max":3201.0},{"key":"20401/GI010202","label":"청년 신규채용","grp":"채용","unit":"명","n":2130.0,"ninst":355.0,"nzero":336.0,"mean":49.99,"sd":146.95,"min":0.0,"p25":2.0,"p50":8.0,"p75":29.0,"p90":119.2,"max":3064.0},{"key":"20401/GI010203","label":"여성 신규채용","grp":"채용","unit":"명","n":2130.0,"ninst":355.0,"nzero":397.0,"mean":28.74,"sd":86.82,"min":0.0,"p25":1.0,"p50":5.0,"p75":15.0,"p90":53.0,"max":919.0},{"key":"20401/GI010205","label":"비수도권 지역인재 채용","grp":"채용","unit":"명","n":2130.0,"ninst":355.0,"nzero":464.0,"mean":37.48,"sd":115.66,"min":0.0,"p25":1.0,"p50":5.0,"p75":19.0,"p90":90.0,"max":2081.0},{"key":"20601/GI0101","label":"직원 1인당 평균보수","grp":"보수","unit":"천원","n":2130.0,"ninst":355.0,"nzero":22.0,"mean":70249.46,"sd":16815.46,"min":0.0,"p25":59690.75,"p50":68751.5,"p75":80886.75,"p90":92376.3,"max":135337.0},{"key":"20601/GI0110","label":"평균근속연수","grp":"보수","unit":"월","n":2130.0,"ninst":355.0,"nzero":26.0,"mean":122.59,"sd":50.45,"min":0.0,"p25":86.0,"p50":125.0,"p75":159.0,"p90":184.0,"max":309.0},{"key":"20601/GI0208","label":"신입사원 초임(합계)","grp":"보수","unit":"천원","n":2130.0,"ninst":355.0,"nzero":30.0,"mean":38256.22,"sd":7310.67,"min":0.0,"p25":34333.25,"p50":38251.0,"p75":42727.5,"p90":46356.6,"max":60224.0},{"key":"31401/GI0101","label":"수입합계","grp":"재정","unit":"백만원","n":2088.0,"ninst":348.0,"nzero":21.0,"mean":2399330.48,"sd":11163062.57,"min":0.0,"p25":26041.75,"p50":81185.0,"p75":458052.25,"p90":2070618.5,"max":134555460.0},{"key":"31401/GI0102","label":"지출합계","grp":"재정","unit":"백만원","n":2088.0,"ninst":348.0,"nzero":23.0,"mean":2397942.76,"sd":11163221.64,"min":0.0,"p25":25987.25,"p50":79365.0,"p75":458052.25,"p90":2062249.4,"max":134555460.0},{"key":"31401/GI0103","label":"정부순지원수입","grp":"재정","unit":"백만원","n":2088.0,"ninst":348.0,"nzero":315.0,"mean":328361.03,"sd":2518365.68,"min":0.0,"p25":6798.25,"p50":23231.5,"p75":80901.5,"p90":365364.0,"max":55475690.0},{"key":"31201/GI010102","label":"부채총계(K-GAAP)","grp":"재정","unit":"백만원","n":1005.0,"ninst":201.0,"nzero":40.0,"mean":57955.33,"sd":184196.4,"min":0.0,"p25":893.0,"p50":5255.0,"p75":21686.0,"p90":98377.8,"max":1570908.0},{"key":"31201/GI010101","label":"자산총계(K-GAAP)","grp":"재정","unit":"백만원","n":1005.0,"ninst":201.0,"nzero":35.0,"mean":131557.73,"sd":355841.11,"min":0.0,"p25":4972.0,"p50":16298.0,"p75":74214.0,"p90":316613.0,"max":3232784.0},{"key":"21301/GI0101","label":"소송건수","grp":"기타","unit":"건","n":1914.0,"ninst":319.0,"nzero":840.0,"mean":55.33,"sd":410.01,"min":0.0,"p25":0.0,"p50":1.0,"p75":4.0,"p90":19.0,"max":7712.0},{"key":"21401/GI0103","label":"남성 육아휴직 사용률","grp":"기타","unit":"%","n":2124.0,"ninst":354.0,"nzero":564.0,"mean":23.78,"sd":22.59,"min":0.0,"p25":0.0,"p50":20.0,"p75":36.52,"p90":54.5,"max":100.0}],"items":[{"key":"20201/GI010101","name":"상임 정원","path":"I. 기관운영 > 임직원수 > 임원 > 기관장 > 상임 정원","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":179.0,"mean":0.92,"sd":0.34,"min":0.0,"p25":1.0,"p50":1.0,"p75":1.0,"p90":1.0,"max":10.0,"meannz":1.0,"y0":2021.0,"y1":2026.0},{"key":"20201/GI010102","name":"상임 현원","path":"I. 기관운영 > 임직원수 > 임원 > 기관장 > 상임 현원","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":357.0,"mean":0.84,"sd":0.43,"min":0.0,"p25":1.0,"p50":1.0,"p75":1.0,"p90":1.0,"max":11.0,"meannz":1.01,"y0":2021.0,"y1":2026.0},{"key":"20201/GI010103","name":"비상임","path":"I. 기관운영 > 임직원수 > 임원 > 기관장 > 비상임","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2048.0,"mean":0.04,"sd":0.19,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1.0,"meannz":1.0,"y0":2021.0,"y1":2026.0},{"key":"20201/GI010201","name":"상임 정원","path":"I. 기관운영 > 임직원수 > 임원 > 이사 > 상임 정원","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1145.0,"mean":1.24,"sd":1.7,"min":0.0,"p25":0.0,"p50":0.0,"p75":2.0,"p90":4.0,"max":8.0,"meannz":2.68,"y0":2021.0,"y1":2026.0},{"key":"20201/GI010202","name":"상임 현원","path":"I. 기관운영 > 임직원수 > 임원 > 이사 > 상임 현원","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1187.0,"mean":1.12,"sd":1.59,"min":0.0,"p25":0.0,"p50":0.0,"p75":2.0,"p90":4.0,"max":8.0,"meannz":2.53,"y0":2021.0,"y1":2026.0},{"key":"20201/GI010203","name":"비상임","path":"I. 기관운영 > 임직원수 > 임원 > 이사 > 비상임","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":266.0,"mean":7.55,"sd":5.8,"min":0.0,"p25":5.0,"p50":7.0,"p75":10.0,"p90":12.0,"max":86.0,"meannz":8.63,"y0":2021.0,"y1":2026.0},{"key":"20201/GI010301","name":"상임 정원","path":"I. 기관운영 > 임직원수 > 임원 > 감사 > 상임 정원","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1644.0,"mean":0.23,"sd":0.42,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":1.0,"max":1.0,"meannz":1.0,"y0":2021.0,"y1":2026.0},{"key":"20201/GI010302","name":"상임 현원","path":"I. 기관운영 > 임직원수 > 임원 > 감사 > 상임 현원","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1684.0,"mean":0.21,"sd":0.41,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":1.0,"max":1.0,"meannz":1.0,"y0":2021.0,"y1":2026.0},{"key":"20201/GI010303","name":"비상임","path":"I. 기관운영 > 임직원수 > 임원 > 감사 > 비상임","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":771.0,"mean":0.7,"sd":0.58,"min":0.0,"p25":0.0,"p50":1.0,"p75":1.0,"p90":1.0,"max":3.0,"meannz":1.1,"y0":2021.0,"y1":2026.0},{"key":"20201/GI0104","name":"기타","path":"I. 기관운영 > 임직원수 > 임원 > 기타","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2130.0,"mean":0.0,"sd":0.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":0.0,"meannz":null,"y0":2021.0,"y1":2026.0},{"key":"20201/GI0105","name":"상임임원 정원 계","path":"I. 기관운영 > 임직원수 > 임원 > 상임임원 정원 계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":112.0,"mean":2.39,"sd":1.96,"min":0.0,"p25":1.0,"p50":2.0,"p75":4.0,"p90":5.0,"max":13.0,"meannz":2.52,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02010101","name":"계","path":"I. 기관운영 > 임직원수 > 정규직 > 일반정규직 > 정원 > 계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":21.0,"mean":1028.89,"sd":2745.94,"min":0.0,"p25":84.0,"p50":179.0,"p75":655.0,"p90":2734.2,"max":32950.0,"meannz":1039.13,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02010102","name":"(별도정원)","path":"I. 기관운영 > 임직원수 > 정규직 > 일반정규직 > 정원 > (별도정원)","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":700.0,"mean":27.12,"sd":113.58,"min":0.0,"p25":0.0,"p50":2.0,"p75":12.0,"p90":54.0,"max":1972.0,"meannz":40.39,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02010103","name":"(탄력정원)","path":"I. 기관운영 > 임직원수 > 정규직 > 일반정규직 > 정원 > (탄력정원)","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2078.0,"mean":0.74,"sd":6.46,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":123.0,"meannz":30.38,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02010201","name":"계","path":"I. 기관운영 > 임직원수 > 정규직 > 일반정규직 > 현원 > 계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":23.0,"mean":970.54,"sd":2639.46,"min":0.0,"p25":75.19,"p50":167.5,"p75":613.75,"p90":2624.43,"max":32032.53,"meannz":981.13,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02010202","name":"전일제","path":"I. 기관운영 > 임직원수 > 정규직 > 일반정규직 > 현원 > 전일제","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":23.0,"mean":963.89,"sd":2625.58,"min":0.0,"p25":75.0,"p50":167.0,"p75":613.5,"p90":2560.5,"max":31925.0,"meannz":974.41,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02010203","name":"단시간","path":"I. 기관운영 > 임직원수 > 정규직 > 일반정규직 > 현원 > 단시간","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1101.0,"mean":6.65,"sd":25.52,"min":0.0,"p25":0.0,"p50":0.0,"p75":2.75,"p90":12.76,"max":405.63,"meannz":13.76,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02020101","name":"계","path":"I. 기관운영 > 임직원수 > 정규직 > 무기계약직 > 정원 > 계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":340.0,"mean":170.21,"sd":478.12,"min":0.0,"p25":8.0,"p50":35.0,"p75":110.1,"p90":320.2,"max":5254.0,"meannz":202.54,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02020102","name":"(별도정원)","path":"I. 기관운영 > 임직원수 > 정규직 > 무기계약직 > 정원 > (별도정원)","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1933.0,"mean":0.54,"sd":3.93,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":71.0,"meannz":5.82,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02020103","name":"(탄력정원)","path":"I. 기관운영 > 임직원수 > 정규직 > 무기계약직 > 정원 > (탄력정원)","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2124.0,"mean":0.01,"sd":0.27,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":5.0,"meannz":5.0,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02020201","name":"계","path":"I. 기관운영 > 임직원수 > 정규직 > 무기계약직 > 현원 > 계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":320.0,"mean":150.63,"sd":428.56,"min":0.0,"p25":7.0,"p50":31.0,"p75":100.0,"p90":277.44,"max":5016.43,"meannz":177.26,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02020202","name":"전일제","path":"I. 기관운영 > 임직원수 > 정규직 > 무기계약직 > 현원 > 전일제","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":320.0,"mean":140.93,"sd":410.09,"min":0.0,"p25":7.0,"p50":30.0,"p75":97.0,"p90":259.2,"max":4994.0,"meannz":165.85,"y0":2021.0,"y1":2026.0},{"key":"20201/GI02020203","name":"단시간","path":"I. 기관운영 > 임직원수 > 정규직 > 무기계약직 > 현원 > 단시간","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1310.0,"mean":9.7,"sd":79.23,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.63,"p90":9.63,"max":1519.1,"meannz":25.2,"y0":2021.0,"y1":2026.0},{"key":"20201/GI03","name":"임직원 총계","path":"I. 기관운영 > 임직원수 > 임직원 총계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":21.0,"mean":1201.49,"sd":2887.24,"min":0.0,"p25":117.0,"p50":260.0,"p75":858.5,"p90":2973.55,"max":32957.0,"meannz":1213.45,"y0":2021.0,"y1":2026.0},{"key":"20201/GI0401","name":"합계","path":"I. 기관운영 > 임직원수 > 여성 현원 > 합계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":21.0,"mean":449.02,"sd":1081.98,"min":0.0,"p25":49.1,"p50":101.94,"p75":292.58,"p90":1051.0,"max":10892.0,"meannz":453.49,"y0":2021.0,"y1":2026.0},{"key":"20201/GI0402","name":"임원","path":"I. 기관운영 > 임직원수 > 여성 현원 > 임원","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":486.0,"mean":2.23,"sd":2.21,"min":0.0,"p25":1.0,"p50":2.0,"p75":3.0,"p90":5.0,"max":29.0,"meannz":2.88,"y0":2021.0,"y1":2026.0},{"key":"20201/GI0403","name":"정규직","path":"I. 기관운영 > 임직원수 > 여성 현원 > 정규직","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":23.0,"mean":446.79,"sd":1082.18,"min":0.0,"p25":47.0,"p50":99.0,"p75":291.38,"p90":1049.0,"max":10890.0,"meannz":451.67,"y0":2021.0,"y1":2026.0},{"key":"20201/GI050101","name":"전일제","path":"I. 기관운영 > 임직원수 > 비정규직 > 기간제 > 전일제","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":131.0,"mean":58.71,"sd":121.06,"min":0.0,"p25":6.0,"p50":17.0,"p75":56.0,"p90":139.0,"max":1225.0,"meannz":62.56,"y0":2021.0,"y1":2026.0},{"key":"20201/GI050102","name":"단시간","path":"I. 기관운영 > 임직원수 > 비정규직 > 기간제 > 단시간","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1403.0,"mean":3.93,"sd":19.64,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":5.4,"max":324.98,"meannz":11.5,"y0":2021.0,"y1":2026.0},{"key":"20201/GI050103","name":"계","path":"I. 기관운영 > 임직원수 > 비정규직 > 기간제 > 계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":110.0,"mean":62.64,"sd":124.77,"min":0.0,"p25":7.0,"p50":18.5,"p75":60.0,"p90":161.72,"max":1225.0,"meannz":66.05,"y0":2021.0,"y1":2026.0},{"key":"20201/GI05010401","name":"전환계획","path":"I. 기관운영 > 임직원수 > 비정규직 > 기간제 > 정규직전환 > 전환계획","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2083.0,"mean":0.15,"sd":1.49,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":30.0,"meannz":6.79,"y0":2021.0,"y1":2026.0},{"key":"20201/GI05010402","name":"전환실적","path":"I. 기관운영 > 임직원수 > 비정규직 > 기간제 > 정규직전환 > 전환실적","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2064.0,"mean":0.57,"sd":7.66,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":205.0,"meannz":18.33,"y0":2021.0,"y1":2026.0},{"key":"20201/GI05010403","name":"전환비율","path":"I. 기관운영 > 임직원수 > 비정규직 > 기간제 > 정규직전환 > 전환비율","unit":"%","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2090.0,"mean":1.7,"sd":12.64,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":100.0,"meannz":90.3,"y0":2021.0,"y1":2026.0},{"key":"20201/GI0502","name":"기타","path":"I. 기관운영 > 임직원수 > 비정규직 > 기타","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1946.0,"mean":7.84,"sd":66.72,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1551.0,"meannz":90.79,"y0":2021.0,"y1":2026.0},{"key":"20201/GI050301","name":"파견","path":"I. 기관운영 > 임직원수 > 비정규직 > 소속외인력 > 파견","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1628.0,"mean":4.5,"sd":25.05,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":5.0,"max":308.0,"meannz":19.1,"y0":2021.0,"y1":2026.0},{"key":"20201/GI050302","name":"용역(민간)","path":"I. 기관운영 > 임직원수 > 비정규직 > 소속외인력 > 용역(민간)","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1308.0,"mean":40.95,"sd":192.98,"min":0.0,"p25":0.0,"p50":0.0,"p75":11.0,"p90":65.0,"max":2597.0,"meannz":106.1,"y0":2021.0,"y1":2026.0},{"key":"20201/GI050303","name":"사내하도급","path":"I. 기관운영 > 임직원수 > 비정규직 > 소속외인력 > 사내하도급","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2007.0,"mean":35.43,"sd":327.32,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":6220.0,"meannz":613.49,"y0":2021.0,"y1":2026.0},{"key":"20201/GI050304","name":"계","path":"I. 기관운영 > 임직원수 > 비정규직 > 소속외인력 > 계","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1032.0,"mean":80.88,"sd":382.59,"min":0.0,"p25":0.0,"p50":1.0,"p75":19.0,"p90":124.1,"max":6255.0,"meannz":156.89,"y0":2021.0,"y1":2026.0},{"key":"20201/GI05030501","name":"전환계획","path":"I. 기관운영 > 임직원수 > 비정규직 > 소속외인력 > 정규직전환 > 전환계획","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2076.0,"mean":3.35,"sd":40.85,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1288.0,"meannz":132.2,"y0":2021.0,"y1":2026.0},{"key":"20201/GI05030502","name":"전환실적","path":"I. 기관운영 > 임직원수 > 비정규직 > 소속외인력 > 정규직전환 > 전환실적","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2086.0,"mean":1.43,"sd":31.65,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1286.0,"meannz":69.45,"y0":2021.0,"y1":2026.0},{"key":"20201/GI05030503","name":"전환비율","path":"I. 기관운영 > 임직원수 > 비정규직 > 소속외인력 > 정규직전환 > 전환비율","unit":"%","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2095.0,"mean":1.46,"sd":11.85,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":100.0,"meannz":88.65,"y0":2021.0,"y1":2026.0},{"key":"20201/GI06","name":"자회사","path":"I. 기관운영 > 임직원수 > 자회사","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":1773.0,"mean":164.12,"sd":869.36,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":192.3,"max":10108.0,"meannz":979.2,"y0":2021.0,"y1":2026.0},{"key":"20201/GI07","name":"연수직","path":"I. 기관운영 > 임직원수 > 연수직","unit":"명","top":"I. 기관운영","grp":"임직원수","n":2130.0,"ninst":355.0,"nzero":2046.0,"mean":2.37,"sd":19.22,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":250.0,"meannz":60.21,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010101","name":"상임임원 총신규채용","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 임원 > 상임임원 총신규채용","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":1262.0,"mean":0.63,"sd":0.98,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":2.0,"max":6.0,"meannz":1.56,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010201","name":"일반정규직 총신규채용","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 정규직(일반정규직) > 일반정규직 총신규채용","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":264.0,"mean":57.84,"sd":164.47,"min":0.0,"p25":3.0,"p50":11.0,"p75":34.0,"p90":136.2,"max":3201.0,"meannz":66.03,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010202","name":"청년","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 정규직(일반정규직) > 청년","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":336.0,"mean":49.99,"sd":146.95,"min":0.0,"p25":2.0,"p50":8.0,"p75":29.0,"p90":119.2,"max":3064.0,"meannz":59.35,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010203","name":"여성","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 정규직(일반정규직) > 여성","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":397.0,"mean":28.74,"sd":86.82,"min":0.0,"p25":1.0,"p50":5.0,"p75":15.0,"p90":53.0,"max":919.0,"meannz":35.33,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010204","name":"장애인","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 정규직(일반정규직) > 장애인","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":1525.0,"mean":1.47,"sd":6.81,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":3.0,"max":124.0,"meannz":5.16,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010205","name":"비수도권 지역인재","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 정규직(일반정규직) > 비수도권 지역인재","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":464.0,"mean":37.48,"sd":115.66,"min":0.0,"p25":1.0,"p50":5.0,"p75":19.0,"p90":90.0,"max":2081.0,"meannz":47.91,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010206","name":"이전지역 지역인재","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 정규직(일반정규직) > 이전지역 지역인재","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":1579.0,"mean":5.37,"sd":23.45,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":14.0,"max":661.0,"meannz":20.75,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010207","name":"고졸 인력","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 정규직(일반정규직) > 고졸 인력","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":1445.0,"mean":5.19,"sd":25.5,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":10.0,"max":722.0,"meannz":16.14,"y0":2021.0,"y1":2026.0},{"key":"20401/GI010301","name":"정규직(무기계약직) 신규채용","path":"I. 기관운영 > 신규채용 현황 > 신규채용 현황 > 정규직(무기계약직) > 정규직(무기계약직) 신규채용","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":837.0,"mean":14.84,"sd":50.48,"min":0.0,"p25":0.0,"p50":2.0,"p75":8.0,"p90":29.03,"max":899.0,"meannz":24.44,"y0":2021.0,"y1":2026.0},{"key":"20401/GI020101","name":"체험형","path":"I. 기관운영 > 신규채용 현황 > 청년인턴 채용현황 > 총인턴채용 > 체험형","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":682.0,"mean":41.14,"sd":118.2,"min":0.0,"p25":0.0,"p50":7.0,"p75":23.0,"p90":92.0,"max":1727.0,"meannz":60.51,"y0":2021.0,"y1":2026.0},{"key":"20401/GI020102","name":"채용형","path":"I. 기관운영 > 신규채용 현황 > 청년인턴 채용현황 > 총인턴채용 > 채용형","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":1824.0,"mean":11.15,"sd":88.09,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":8.1,"max":2900.0,"meannz":77.62,"y0":2021.0,"y1":2026.0},{"key":"20401/GI020201","name":"체험형","path":"I. 기관운영 > 신규채용 현황 > 청년인턴 채용현황 > 여성 > 체험형","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":715.0,"mean":24.22,"sd":69.59,"min":0.0,"p25":0.0,"p50":4.0,"p75":15.0,"p90":52.0,"max":919.0,"meannz":36.46,"y0":2021.0,"y1":2026.0},{"key":"20401/GI020202","name":"채용형","path":"I. 기관운영 > 신규채용 현황 > 청년인턴 채용현황 > 여성 > 채용형","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":1838.0,"mean":3.9,"sd":26.37,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":4.0,"max":799.0,"meannz":28.41,"y0":2021.0,"y1":2026.0},{"key":"20401/GI020301","name":"체험형","path":"I. 기관운영 > 신규채용 현황 > 청년인턴 채용현황 > 장애인 > 체험형","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":1504.0,"mean":3.31,"sd":12.49,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":6.0,"max":156.0,"meannz":11.26,"y0":2021.0,"y1":2026.0},{"key":"20401/GI020302","name":"채용형","path":"I. 기관운영 > 신규채용 현황 > 청년인턴 채용현황 > 장애인 > 채용형","unit":"명","top":"I. 기관운영","grp":"신규채용 현황","n":2130.0,"ninst":355.0,"nzero":2020.0,"mean":0.36,"sd":3.25,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":71.0,"meannz":6.9,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010101","name":"기본급","path":"I. 기관운영 > 임원연봉 > 상임기관장 > 기본급","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1974.0,"ninst":329.0,"nzero":108.0,"mean":134890.68,"sd":43000.04,"min":0.0,"p25":121424.75,"p50":144396.5,"p75":154140.0,"p90":163684.0,"max":287297.0,"meannz":142697.85,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010102","name":"고정수당","path":"I. 기관운영 > 임원연봉 > 상임기관장 > 고정수당","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1974.0,"ninst":329.0,"nzero":1497.0,"mean":6779.53,"sd":17841.31,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":22440.0,"max":175429.0,"meannz":28056.18,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010103","name":"실적수당","path":"I. 기관운영 > 임원연봉 > 상임기관장 > 실적수당","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1974.0,"ninst":329.0,"nzero":1870.0,"mean":3893.82,"sd":19817.78,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":180000.0,"meannz":73907.67,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010104","name":"급여성 복리후생비","path":"I. 기관운영 > 임원연봉 > 상임기관장 > 급여성 복리후생비","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1974.0,"ninst":329.0,"nzero":1520.0,"mean":219.21,"sd":721.11,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":895.5,"max":15728.0,"meannz":953.11,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010105","name":"성과상여금","path":"I. 기관운영 > 임원연봉 > 상임기관장 > 성과상여금","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1974.0,"ninst":329.0,"nzero":520.0,"mean":36386.58,"sd":33437.07,"min":0.0,"p25":0.0,"p50":34990.5,"p75":54402.75,"p90":73987.0,"max":253754.0,"meannz":49399.66,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010106","name":"(경영평가 성과급)","path":"I. 기관운영 > 임원연봉 > 상임기관장 > (경영평가 성과급)","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1974.0,"ninst":329.0,"nzero":1543.0,"mean":12212.29,"sd":26117.48,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":55426.2,"max":137506.0,"meannz":55932.87,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010107","name":"기타","path":"I. 기관운영 > 임원연봉 > 상임기관장 > 기타","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1974.0,"ninst":329.0,"nzero":1940.0,"mean":34.19,"sd":529.38,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":11154.0,"meannz":1984.91,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010108","name":"합계","path":"I. 기관운영 > 임원연봉 > 상임기관장 > 합계","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1974.0,"ninst":329.0,"nzero":29.0,"mean":182204.0,"sd":53359.19,"min":0.0,"p25":154005.0,"p50":174850.0,"p75":206851.5,"p90":232289.0,"max":471136.0,"meannz":184920.66,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010201","name":"기본급","path":"I. 기관운영 > 임원연봉 > 상임감사 > 기본급","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":582.0,"ninst":97.0,"nzero":6.0,"mean":120271.3,"sd":32159.96,"min":0.0,"p25":107209.75,"p50":117597.5,"p75":130658.0,"p90":173959.0,"max":197073.0,"meannz":121524.13,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010202","name":"고정수당","path":"I. 기관운영 > 임원연봉 > 상임감사 > 고정수당","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":582.0,"ninst":97.0,"nzero":474.0,"mean":7108.97,"sd":17394.5,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":41266.1,"max":74472.0,"meannz":38309.44,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010203","name":"실적수당","path":"I. 기관운영 > 임원연봉 > 상임감사 > 실적수당","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":582.0,"ninst":97.0,"nzero":534.0,"mean":291.34,"sd":1362.37,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":13147.0,"meannz":3532.5,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010204","name":"급여성 복리후생비","path":"I. 기관운영 > 임원연봉 > 상임감사 > 급여성 복리후생비","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":582.0,"ninst":97.0,"nzero":452.0,"mean":156.28,"sd":343.85,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":700.0,"max":1584.0,"meannz":699.67,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010205","name":"성과상여금","path":"I. 기관운영 > 임원연봉 > 상임감사 > 성과상여금","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":582.0,"ninst":97.0,"nzero":199.0,"mean":31951.25,"sd":31316.26,"min":0.0,"p25":0.0,"p50":32064.0,"p75":49813.75,"p90":66566.3,"max":163975.0,"meannz":48552.55,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010206","name":"(경영평가 성과급)","path":"I. 기관운영 > 임원연봉 > 상임감사 > (경영평가 성과급)","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":582.0,"ninst":97.0,"nzero":307.0,"mean":20625.88,"sd":24563.34,"min":0.0,"p25":0.0,"p50":0.0,"p75":39447.0,"p90":58676.2,"max":99878.0,"meannz":43651.85,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010207","name":"기타","path":"I. 기관운영 > 임원연봉 > 상임감사 > 기타","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":582.0,"ninst":97.0,"nzero":571.0,"mean":3.01,"sd":29.8,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":500.0,"meannz":159.18,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010208","name":"합계","path":"I. 기관운영 > 임원연봉 > 상임감사 > 합계","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":582.0,"ninst":97.0,"nzero":6.0,"mean":159782.15,"sd":47676.85,"min":0.0,"p25":130944.25,"p50":152212.5,"p75":175571.0,"p90":227446.3,"max":337880.0,"meannz":161446.54,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010301","name":"기본급","path":"I. 기관운영 > 임원연봉 > 상임이사 > 기본급","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1014.0,"ninst":169.0,"nzero":32.0,"mean":116417.86,"sd":29419.21,"min":0.0,"p25":109651.25,"p50":117118.0,"p75":126629.75,"p90":142717.4,"max":196177.0,"meannz":120211.52,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010302","name":"고정수당","path":"I. 기관운영 > 임원연봉 > 상임이사 > 고정수당","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1014.0,"ninst":169.0,"nzero":914.0,"mean":1233.12,"sd":4993.35,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":50000.0,"meannz":12503.8,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010303","name":"실적수당","path":"I. 기관운영 > 임원연봉 > 상임이사 > 실적수당","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1014.0,"ninst":169.0,"nzero":1000.0,"mean":57.08,"sd":572.53,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":8627.0,"meannz":4134.07,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010304","name":"급여성 복리후생비","path":"I. 기관운영 > 임원연봉 > 상임이사 > 급여성 복리후생비","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1014.0,"ninst":169.0,"nzero":903.0,"mean":62.61,"sd":343.67,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":50.0,"max":6000.0,"meannz":571.98,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010305","name":"성과상여금","path":"I. 기관운영 > 임원연봉 > 상임이사 > 성과상여금","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1014.0,"ninst":169.0,"nzero":292.0,"mean":30904.47,"sd":27824.45,"min":0.0,"p25":0.0,"p50":31488.0,"p75":48338.0,"p90":62131.1,"max":162546.0,"meannz":43403.23,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010306","name":"(경영평가 성과급)","path":"I. 기관운영 > 임원연봉 > 상임이사 > (경영평가 성과급)","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1014.0,"ninst":169.0,"nzero":630.0,"mean":16068.94,"sd":23549.05,"min":0.0,"p25":0.0,"p50":0.0,"p75":35204.75,"p90":52996.4,"max":98091.0,"meannz":42432.04,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010307","name":"기타","path":"I. 기관운영 > 임원연봉 > 상임이사 > 기타","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1014.0,"ninst":169.0,"nzero":994.0,"mean":2.61,"sd":36.86,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1060.0,"meannz":132.2,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN010308","name":"합계","path":"I. 기관운영 > 임원연봉 > 상임이사 > 합계","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1014.0,"ninst":169.0,"nzero":31.0,"mean":148677.75,"sd":46660.12,"min":0.0,"p25":127453.75,"p50":147790.0,"p75":170042.0,"p90":192668.0,"max":336451.0,"meannz":153366.47,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN020101","name":"정액","path":"I. 기관운영 > 임원연봉 > 비상임감사 > 정액","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1440.0,"ninst":240.0,"nzero":930.0,"mean":5808.69,"sd":9050.25,"min":0.0,"p25":0.0,"p50":0.0,"p75":12000.0,"p90":24000.0,"max":48000.0,"meannz":16401.0,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN020102","name":"회의참석수당","path":"I. 기관운영 > 임원연봉 > 비상임감사 > 회의참석수당","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1440.0,"ninst":240.0,"nzero":368.0,"mean":1462.28,"sd":1811.25,"min":0.0,"p25":0.0,"p50":900.0,"p75":2000.0,"p90":3900.0,"max":15000.0,"meannz":1964.26,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN020103","name":"기타","path":"I. 기관운영 > 임원연봉 > 비상임감사 > 기타","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1440.0,"ninst":240.0,"nzero":1150.0,"mean":814.37,"sd":3089.14,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":1124.4,"max":24000.0,"meannz":4043.77,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN020104","name":"합계","path":"I. 기관운영 > 임원연봉 > 비상임감사 > 합계","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1440.0,"ninst":240.0,"nzero":79.0,"mean":8085.34,"sd":9282.27,"min":0.0,"p25":995.0,"p50":3000.0,"p75":12000.0,"p90":24000.0,"max":51000.0,"meannz":8554.66,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN020201","name":"정액","path":"I. 기관운영 > 임원연봉 > 비상임이사 > 정액","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1830.0,"ninst":305.0,"nzero":1267.0,"mean":6666.83,"sd":11788.46,"min":0.0,"p25":0.0,"p50":0.0,"p75":12000.0,"p90":24000.0,"max":183000.0,"meannz":21670.17,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN020202","name":"회의참석수당","path":"I. 기관운영 > 임원연봉 > 비상임이사 > 회의참석수당","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1830.0,"ninst":305.0,"nzero":106.0,"mean":3023.33,"sd":3300.77,"min":0.0,"p25":862.25,"p50":1875.0,"p75":4278.75,"p90":6101.2,"max":37600.0,"meannz":3209.22,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN020203","name":"기타","path":"I. 기관운영 > 임원연봉 > 비상임이사 > 기타","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1830.0,"ninst":305.0,"nzero":1532.0,"mean":530.25,"sd":3302.72,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":519.1,"max":57300.0,"meannz":3256.22,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN020204","name":"합계","path":"I. 기관운영 > 임원연봉 > 비상임이사 > 합계","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":1830.0,"ninst":305.0,"nzero":28.0,"mean":10220.41,"sd":13519.2,"min":0.0,"p25":1102.0,"p50":3247.5,"p75":17731.25,"p90":30000.0,"max":230050.0,"meannz":10379.22,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN030101","name":"상임임원평균연봉","path":"I. 기관운영 > 임원연봉 > 상임임원 평균보수 > 상임임원평균연봉","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":2010.0,"ninst":335.0,"nzero":26.0,"mean":165720.71,"sd":44185.54,"min":0.0,"p25":141259.0,"p50":162233.0,"p75":186741.75,"p90":213535.5,"max":430302.0,"meannz":167892.46,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN030102","name":"(남성)","path":"I. 기관운영 > 임원연봉 > 상임임원 평균보수 > (남성)","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":2010.0,"ninst":335.0,"nzero":173.0,"mean":154064.08,"sd":62506.78,"min":0.0,"p25":134375.25,"p50":160677.0,"p75":185980.25,"p90":213519.0,"max":430302.0,"meannz":168573.11,"y0":2021.0,"y1":2026.0},{"key":"20501/GIN030103","name":"(여성)","path":"I. 기관운영 > 임원연봉 > 상임임원 평균보수 > (여성)","unit":"천원","top":"I. 기관운영","grp":"임원연봉","n":2010.0,"ninst":335.0,"nzero":1688.0,"mean":24729.01,"sd":58325.86,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":147302.4,"max":300819.0,"meannz":154364.31,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0101","name":"1인당 평균 보수액","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 1인당 평균 보수액","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":22.0,"mean":70249.46,"sd":16815.46,"min":0.0,"p25":59690.75,"p50":68751.5,"p75":80886.75,"p90":92376.3,"max":135337.0,"meannz":70982.61,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0102","name":"기본급","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 기본급","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":22.0,"mean":50032.81,"sd":13205.02,"min":0.0,"p25":41337.25,"p50":49793.0,"p75":58023.0,"p90":65969.9,"max":100728.0,"meannz":50554.98,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0103","name":"고정수당","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 고정수당","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":64.0,"mean":6853.96,"sd":6806.18,"min":0.0,"p25":2051.25,"p50":4539.0,"p75":9069.25,"p90":16658.3,"max":44331.0,"meannz":7066.28,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0104","name":"실적수당","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 실적수당","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":220.0,"mean":2920.17,"sd":3398.8,"min":-6.0,"p25":531.5,"p50":1986.5,"p75":3838.0,"p90":6725.5,"max":21849.0,"meannz":3256.53,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0105","name":"급여성 복리후생비","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 급여성 복리후생비","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":209.0,"mean":805.56,"sd":579.74,"min":0.0,"p25":402.0,"p50":777.5,"p75":1159.0,"p90":1509.0,"max":5088.0,"meannz":893.2,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0106","name":"성과상여금","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 성과상여금","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":215.0,"mean":9565.59,"sd":8327.37,"min":0.0,"p25":3195.5,"p50":7197.5,"p75":14176.5,"p90":20675.3,"max":62785.0,"meannz":10639.54,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0107","name":"(경영평가 성과급)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > (경영평가 성과급)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":1666.0,"mean":669.34,"sd":1810.43,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":2088.8,"max":13097.0,"meannz":3072.61,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0108","name":"기타","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 기타","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":1696.0,"mean":93.53,"sd":608.56,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":75.1,"max":9036.0,"meannz":459.01,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0109","name":"상시종업원수","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 상시종업원수","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":23.0,"mean":964.47,"sd":2632.1,"min":0.0,"p25":74.08,"p50":164.5,"p75":603.0,"p90":2622.41,"max":31322.16,"meannz":975.0,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0110","name":"평균근속연수","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 평균근속연수","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":26.0,"mean":122.59,"sd":50.45,"min":0.0,"p25":86.0,"p50":125.0,"p75":159.0,"p90":184.0,"max":309.0,"meannz":124.11,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0111","name":"1인당 평균 보수액 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 1인당 평균 보수액 (남성)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":26.0,"mean":75259.96,"sd":18476.12,"min":0.0,"p25":63886.5,"p50":74046.5,"p75":86897.0,"p90":98488.0,"max":144551.0,"meannz":76189.98,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0112","name":"1인당 평균 보수액 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 1인당 평균 보수액 (여성)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":26.0,"mean":61778.98,"sd":14574.82,"min":0.0,"p25":52726.75,"p50":60697.0,"p75":70701.0,"p90":80159.8,"max":116358.0,"meannz":62542.41,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0113","name":"상시종업원수 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 상시종업원수 (남성)","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":23.0,"mean":605.2,"sd":1960.69,"min":0.0,"p25":39.52,"p50":103.5,"p75":397.16,"p90":1542.42,"max":27282.25,"meannz":611.8,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0114","name":"상시종업원수 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 상시종업원수 (여성)","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":24.0,"mean":359.29,"sd":971.22,"min":0.0,"p25":31.17,"p50":64.98,"p75":182.82,"p90":716.45,"max":10436.25,"meannz":363.38,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0115","name":"평균근속연수 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 평균근속연수 (남성)","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":26.0,"mean":130.91,"sd":55.67,"min":0.0,"p25":92.0,"p50":134.0,"p75":172.0,"p90":201.0,"max":312.0,"meannz":132.53,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0116","name":"평균근속연수 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 평균근속연수 (여성)","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":27.0,"mean":105.68,"sd":44.1,"min":0.0,"p25":75.7,"p50":107.0,"p75":135.0,"p90":159.0,"max":266.0,"meannz":107.04,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0117","name":"평균임금 비율(남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 평균임금 비율(남성)","unit":"%","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":26.0,"mean":79.19,"sd":366.94,"min":0.0,"p25":53.16,"p50":54.81,"p75":56.46,"p90":58.0,"max":5715.0,"meannz":80.17,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0118","name":"평균임금 비율(여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(일반정규직) > 평균임금 비율(여성)","unit":"%","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":26.0,"mean":57.13,"sd":238.29,"min":0.0,"p25":43.46,"p50":45.12,"p75":46.74,"p90":48.55,"max":4831.0,"meannz":57.84,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0201","name":"기본급","path":"I. 기관운영 > 직원 평균보수 현황 > 신입사원 초임 > 기본급","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":30.0,"mean":30056.5,"sd":7041.76,"min":0.0,"p25":26040.0,"p50":29861.5,"p75":34596.0,"p90":38724.0,"max":48870.0,"meannz":30485.88,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0202","name":"고정수당","path":"I. 기관운영 > 직원 평균보수 현황 > 신입사원 초임 > 고정수당","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":495.0,"mean":3997.73,"sd":4749.08,"min":0.0,"p25":109.25,"p50":2400.0,"p75":5880.0,"p90":11121.5,"max":26160.0,"meannz":5208.06,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0203","name":"실적수당","path":"I. 기관운영 > 직원 평균보수 현황 > 신입사원 초임 > 실적수당","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":824.0,"mean":1184.37,"sd":1639.92,"min":0.0,"p25":0.0,"p50":463.5,"p75":2010.0,"p90":3265.1,"max":14133.0,"meannz":1931.64,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0204","name":"급여성 복리후생비","path":"I. 기관운영 > 직원 평균보수 현황 > 신입사원 초임 > 급여성 복리후생비","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":559.0,"mean":560.86,"sd":504.47,"min":0.0,"p25":0.0,"p50":503.5,"p75":900.0,"p90":1200.0,"max":3000.0,"meannz":760.43,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0205","name":"성과상여금","path":"I. 기관운영 > 직원 평균보수 현황 > 신입사원 초임 > 성과상여금","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":1277.0,"mean":2451.27,"sd":4070.49,"min":0.0,"p25":0.0,"p50":0.0,"p75":4448.25,"p90":8129.0,"max":23556.0,"meannz":6120.98,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0206","name":"(경영평가 성과급)","path":"I. 기관운영 > 직원 평균보수 현황 > 신입사원 초임 > (경영평가 성과급)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":2130.0,"mean":0.0,"sd":0.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":0.0,"meannz":null,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0207","name":"기타","path":"I. 기관운영 > 직원 평균보수 현황 > 신입사원 초임 > 기타","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":2084.0,"mean":5.48,"sd":86.97,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1750.0,"meannz":253.89,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0208","name":"합계","path":"I. 기관운영 > 직원 평균보수 현황 > 신입사원 초임 > 합계","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":2130.0,"ninst":355.0,"nzero":30.0,"mean":38256.22,"sd":7310.67,"min":0.0,"p25":34333.25,"p50":38251.0,"p75":42727.5,"p90":46356.6,"max":60224.0,"meannz":38802.74,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0301","name":"1인당 평균 보수액","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 1인당 평균 보수액","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":63.0,"mean":42649.86,"sd":14448.92,"min":0.0,"p25":35689.75,"p50":41099.0,"p75":48553.75,"p90":58084.5,"max":242270.0,"meannz":44125.39,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0302","name":"기본급","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 기본급","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":63.0,"mean":31594.23,"sd":11351.48,"min":0.0,"p25":26146.25,"p50":30424.0,"p75":36544.5,"p90":44145.4,"max":228170.0,"meannz":32687.27,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0303","name":"고정수당","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 고정수당","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":177.0,"mean":3571.55,"sd":3926.89,"min":0.0,"p25":720.0,"p50":2604.0,"p75":4777.25,"p90":8522.8,"max":31264.0,"meannz":3941.89,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0304","name":"실적수당","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 실적수당","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":241.0,"mean":2188.79,"sd":2300.25,"min":-228.0,"p25":566.75,"p50":1620.0,"p75":3055.75,"p90":4826.5,"max":16860.0,"meannz":2509.85,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0305","name":"급여성 복리후생비","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 급여성 복리후생비","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":234.0,"mean":719.03,"sd":556.69,"min":0.0,"p25":316.5,"p50":694.0,"p75":1024.25,"p90":1388.0,"max":5608.0,"meannz":821.01,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0306","name":"성과상여금","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 성과상여금","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":290.0,"mean":4538.09,"sd":5917.57,"min":0.0,"p25":920.5,"p50":2693.0,"p75":6350.75,"p90":11437.7,"max":95260.0,"meannz":5363.72,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0307","name":"(경영평가 성과급)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > (경영평가 성과급)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":1492.0,"mean":287.81,"sd":832.21,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":977.4,"max":7224.0,"meannz":1383.27,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0308","name":"기타","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 기타","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":1617.0,"mean":41.38,"sd":269.83,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":13.0,"max":4816.0,"meannz":292.01,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0309","name":"상시종업원수","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 상시종업원수","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":66.0,"mean":162.27,"sd":430.56,"min":0.0,"p25":11.9,"p50":41.71,"p75":111.8,"p90":325.28,"max":4685.25,"meannz":168.16,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0310","name":"평균근속연수","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 평균근속연수","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":71.0,"mean":64.57,"sd":34.49,"min":0.0,"p25":42.0,"p50":61.0,"p75":82.0,"p90":108.0,"max":192.0,"meannz":67.1,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0311","name":"1인당 평균 보수액 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 1인당 평균 보수액 (남성)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":103.0,"mean":44663.82,"sd":17309.13,"min":0.0,"p25":37032.75,"p50":43497.5,"p75":52098.0,"p90":63404.8,"max":242270.0,"meannz":47246.84,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0312","name":"1인당 평균 보수액 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 1인당 평균 보수액 (여성)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":104.0,"mean":38785.54,"sd":13341.84,"min":0.0,"p25":33378.25,"p50":38389.0,"p75":45285.0,"p90":52903.4,"max":83515.0,"meannz":41051.67,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0313","name":"상시종업원수 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 상시종업원수 (남성)","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":103.0,"mean":77.5,"sd":222.25,"min":0.0,"p25":5.0,"p50":15.67,"p75":56.4,"p90":145.41,"max":2409.57,"meannz":81.99,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0314","name":"상시종업원수 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 상시종업원수 (여성)","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":102.0,"mean":85.04,"sd":234.57,"min":0.0,"p25":6.0,"p50":23.06,"p75":58.0,"p90":145.58,"max":2464.33,"meannz":89.9,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0315","name":"평균근속연수 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 평균근속연수 (남성)","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":111.0,"mean":63.62,"sd":36.59,"min":0.0,"p25":40.0,"p50":60.0,"p75":84.0,"p90":111.0,"max":218.0,"meannz":67.61,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0316","name":"평균근속연수 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 평균근속연수 (여성)","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":114.0,"mean":61.92,"sd":36.03,"min":0.0,"p25":39.0,"p50":59.0,"p75":80.0,"p90":105.0,"max":282.0,"meannz":65.91,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0317","name":"평균임금 비율(남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 평균임금 비율(남성)","unit":"%","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":103.0,"mean":53.93,"sd":129.03,"min":0.0,"p25":50.5,"p50":52.56,"p75":54.8,"p90":57.97,"max":5615.0,"meannz":57.05,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0318","name":"평균임금 비율(여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(무기계약직) > 평균임금 비율(여성)","unit":"%","top":"I. 기관운영","grp":"직원 평균보수 현황","n":1884.0,"ninst":314.0,"nzero":104.0,"mean":53.03,"sd":198.01,"min":0.0,"p25":44.68,"p50":47.08,"p75":49.15,"p90":50.61,"max":5553.0,"meannz":56.13,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0401","name":"1인당 평균 보수액","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 1인당 평균 보수액","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":46.0,"mean":36898.62,"sd":16295.09,"min":0.0,"p25":31455.5,"p50":36887.0,"p75":44010.0,"p90":51936.4,"max":120361.0,"meannz":39962.4,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0402","name":"기본급","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 기본급","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":47.0,"mean":26358.38,"sd":12156.86,"min":0.0,"p25":22491.25,"p50":25940.5,"p75":30593.25,"p90":38069.9,"max":90808.0,"meannz":28598.61,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0403","name":"고정수당","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 고정수당","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":137.0,"mean":4392.99,"sd":4967.96,"min":0.0,"p25":255.25,"p50":3234.0,"p75":6406.75,"p90":10445.1,"max":29592.0,"meannz":5692.86,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0404","name":"실적수당","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 실적수당","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":152.0,"mean":2145.72,"sd":3865.82,"min":0.0,"p25":0.0,"p50":707.5,"p75":2554.5,"p90":5805.4,"max":40489.0,"meannz":2873.73,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0405","name":"급여성 복리후생비","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 급여성 복리후생비","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":127.0,"mean":944.55,"sd":862.79,"min":0.0,"p25":222.25,"p50":863.5,"p75":1390.25,"p90":1960.0,"max":9523.0,"meannz":1198.16,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0406","name":"성과상여금","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 성과상여금","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":135.0,"mean":3045.1,"sd":3864.44,"min":0.0,"p25":264.75,"p50":1722.5,"p75":4327.0,"p90":7724.3,"max":32113.0,"meannz":3929.16,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0407","name":"(경영평가 성과급)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > (경영평가 성과급)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":381.0,"mean":401.93,"sd":914.86,"min":0.0,"p25":0.0,"p50":0.0,"p75":594.25,"p90":1096.7,"max":10762.0,"meannz":1101.17,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0408","name":"기타","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 기타","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":555.0,"mean":6.56,"sd":52.59,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1118.0,"meannz":87.49,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0409","name":"상시종업원수","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 상시종업원수","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":47.0,"mean":30.14,"sd":156.09,"min":0.0,"p25":1.0,"p50":2.96,"p75":10.98,"p90":34.1,"max":1508.87,"meannz":32.71,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0410","name":"평균근속연수","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 평균근속연수","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":59.0,"mean":55.61,"sd":35.74,"min":0.0,"p25":32.0,"p50":54.0,"p75":77.0,"p90":99.1,"max":304.0,"meannz":61.68,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0411","name":"1인당 평균 보수액 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 1인당 평균 보수액 (남성)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":344.0,"mean":15750.3,"sd":19411.6,"min":0.0,"p25":0.0,"p50":0.0,"p75":34327.25,"p90":42823.7,"max":77288.0,"meannz":36914.77,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0412","name":"1인당 평균 보수액 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 1인당 평균 보수액 (여성)","unit":"천원","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":58.0,"mean":36170.68,"sd":17223.34,"min":0.0,"p25":30991.75,"p50":36539.0,"p75":43826.0,"p90":52375.0,"max":120361.0,"meannz":40041.34,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0413","name":"상시종업원수 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 상시종업원수 (남성)","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":345.0,"mean":7.26,"sd":44.57,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.25,"p90":9.5,"max":638.8,"meannz":17.08,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0414","name":"상시종업원수 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 상시종업원수 (여성)","unit":"명","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":58.0,"mean":22.81,"sd":115.06,"min":0.0,"p25":0.75,"p50":2.63,"p75":9.41,"p90":29.71,"max":1137.35,"meannz":25.25,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0415","name":"평균근속연수 (남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 평균근속연수 (남성)","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":366.0,"mean":17.7,"sd":27.2,"min":0.0,"p25":0.0,"p50":0.0,"p75":34.0,"p90":61.0,"max":123.0,"meannz":45.38,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0416","name":"평균근속연수 (여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 평균근속연수 (여성)","unit":"월","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":70.0,"mean":56.36,"sd":38.55,"min":0.0,"p25":31.0,"p50":55.0,"p75":78.0,"p90":100.0,"max":304.0,"meannz":63.8,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0417","name":"평균임금 비율(남성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 평균임금 비율(남성)","unit":"%","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":344.0,"mean":21.89,"sd":26.66,"min":0.0,"p25":0.0,"p50":0.0,"p75":49.74,"p90":51.77,"max":100.0,"meannz":51.3,"y0":2021.0,"y1":2026.0},{"key":"20601/GI0418","name":"평균임금 비율(여성)","path":"I. 기관운영 > 직원 평균보수 현황 > 직원평균보수 > 정규직(단시간 무기계약직) > 평균임금 비율(여성)","unit":"%","top":"I. 기관운영","grp":"직원 평균보수 현황","n":600.0,"ninst":100.0,"nzero":58.0,"mean":70.28,"sd":33.02,"min":0.0,"p25":49.25,"p50":91.58,"p75":100.0,"p90":100.0,"max":100.0,"meannz":77.8,"y0":2021.0,"y1":2026.0},{"key":"20701/GI01","name":"집행내역","path":"I. 기관운영 > 기관장업무추진비 > 집행내역","unit":"천원","top":"I. 기관운영","grp":"기관장업무추진비","n":1755.0,"ninst":351.0,"nzero":59.0,"mean":12247.79,"sd":8423.77,"min":0.0,"p25":5985.5,"p50":10954.0,"p75":17172.0,"p90":23672.4,"max":45700.0,"meannz":12673.86,"y0":2021.0,"y1":2025.0},{"key":"20801/GI010201","name":"보육비","path":"I. 기관운영 > 복리후생비 > 예산상 복리후생비 > 비급여성 > 보육비","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":540.0,"ninst":108.0,"nzero":540.0,"mean":0.0,"sd":0.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":0.0,"meannz":null,"y0":2021.0,"y1":2025.0},{"key":"20801/GI010205","name":"생활안정자금","path":"I. 기관운영 > 복리후생비 > 예산상 복리후생비 > 비급여성 > 생활안정자금","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":540.0,"ninst":108.0,"nzero":540.0,"mean":0.0,"sd":0.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":0.0,"meannz":null,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020101","name":"전년도말 기금잔액(A)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 전년도말 기금잔액(A)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":21.0,"mean":22508933.45,"sd":51116235.75,"min":0.0,"p25":1338414.0,"p50":5464338.0,"p75":19865454.0,"p90":50591274.2,"max":390521275.0,"meannz":23465790.95,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010101","name":"기본재산","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 전년도말 기금잔액(A) > 기본재산","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":21.0,"mean":20561260.56,"sd":45308016.63,"min":0.0,"p25":1295954.0,"p50":5073000.0,"p75":19203087.5,"p90":46343857.4,"max":314036650.0,"meannz":21435322.24,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010102","name":"목적사업 준비금 등","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 전년도말 기금잔액(A) > 목적사업 준비금 등","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":47.0,"mean":1947672.89,"sd":6964067.09,"min":0.0,"p25":42787.5,"p50":239967.0,"p75":950501.0,"p90":3077259.2,"max":76484625.0,"meannz":2143272.52,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020102","name":"출연액(B)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 출연액(B)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":263.0,"mean":1793925.13,"sd":6639932.09,"min":0.0,"p25":0.0,"p50":0.0,"p75":676735.0,"p90":3551136.0,"max":66320298.0,"meannz":3666156.52,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010201","name":"기본재산","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 출연액(B) > 기본재산","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":264.0,"mean":786225.11,"sd":2739071.97,"min":0.0,"p25":0.0,"p50":0.0,"p75":337400.0,"p90":1507141.2,"max":31009635.0,"meannz":1613171.05,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010202","name":"목적사업 준비금 등","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 출연액(B) > 목적사업 준비금 등","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":317.0,"mean":1007700.02,"sd":4475212.8,"min":0.0,"p25":0.0,"p50":0.0,"p75":193790.0,"p90":1611080.0,"max":48246291.0,"meannz":2621037.93,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020103","name":"기타수입(C)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 기타수입(C)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":19.0,"mean":611629.33,"sd":1473728.86,"min":0.0,"p25":23960.5,"p50":136467.0,"p75":507323.0,"p90":1516868.6,"max":11914286.0,"meannz":635058.68,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010301","name":"기본재산","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 기타수입(C) > 기본재산","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":456.0,"mean":22173.49,"sd":153031.97,"min":-30461.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":34.4,"max":1901125.0,"meannz":193548.25,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010302","name":"목적사업 준비금 등","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 기타수입(C) > 목적사업 준비금 등","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":39.0,"mean":589455.84,"sd":1469041.08,"min":0.0,"p25":12560.5,"p50":134229.0,"p75":472829.5,"p90":1368569.2,"max":11914286.0,"meannz":637751.59,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020104","name":"사용액(D)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 사용액(D)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":31.0,"mean":1962983.18,"sd":6288098.75,"min":0.0,"p25":23638.5,"p50":230636.0,"p75":1271666.5,"p90":3366770.2,"max":56829727.0,"meannz":2088711.44,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010401","name":"용도사업(무상지원)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 사용액(D) > 용도사업(무상지원)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":104.0,"mean":1884278.43,"sd":5886886.22,"min":0.0,"p25":20190.0,"p50":219700.0,"p75":1271018.5,"p90":3260031.8,"max":42562799.0,"meannz":2361078.81,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010402","name":"기타비용","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 사용액(D) > 기타비용","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":37.0,"mean":78704.76,"sd":769222.31,"min":0.0,"p25":388.0,"p50":1666.0,"p75":5105.0,"p90":21460.4,"max":14266928.0,"meannz":84796.97,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010403","name":"대부사업(융자)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 사용액(D) > 대부사업(융자)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":234.0,"mean":2075915.0,"sd":5866682.09,"min":0.0,"p25":0.0,"p50":197000.0,"p75":1619500.0,"p90":4321680.0,"max":74247446.0,"meannz":3804612.91,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020106","name":"당해연도말 기금잔액(E)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 당해연도말 기금잔액(E)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":14.0,"mean":22951504.73,"sd":50813662.4,"min":0.0,"p25":1426394.0,"p50":5515176.0,"p75":21085496.0,"p90":51903772.8,"max":390521275.0,"meannz":23592864.15,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010601","name":"기본재산","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 당해연도말 기금잔액(E) > 기본재산","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":14.0,"mean":20906449.82,"sd":44979221.29,"min":0.0,"p25":1334530.0,"p50":5155000.0,"p75":20574566.0,"p90":48571443.8,"max":314036650.0,"meannz":21490661.99,"y0":2021.0,"y1":2025.0},{"key":"20801/GI02010602","name":"목적사업 준비금 등","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 당해연도말 기금잔액(E) > 목적사업 준비금 등","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":41.0,"mean":2045054.91,"sd":6855630.73,"min":0.0,"p25":53394.0,"p50":271306.0,"p75":1013119.5,"p90":3413984.2,"max":76484625.0,"meannz":2221947.85,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020107","name":"전년도 세전순이익(F)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 전년도 세전순이익(F)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":59.0,"mean":45358171.32,"sd":1714726742.28,"min":-34658098940.0,"p25":0.0,"p50":3405424.0,"p75":53665063.5,"p90":385524672.8,"max":5426200532.0,"meannz":51226882.08,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020108","name":"수혜자수(G)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 수혜자수(G)","unit":"명","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":22.0,"mean":2486.44,"sd":4343.82,"min":0.0,"p25":381.5,"p50":1086.0,"p75":2788.5,"p90":6178.4,"max":32095.53,"meannz":2597.4,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020109","name":"출연비율(B/F×100)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 출연비율(B/F×100)","unit":"%","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":265.0,"mean":1.4,"sd":1.92,"min":0.0,"p25":0.0,"p50":0.0,"p75":3.0,"p90":4.99,"max":9.13,"meannz":2.88,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020110","name":"1인당 출연액(B/G)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 1인당 출연액(B/G)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":265.0,"mean":687.95,"sd":1608.4,"min":0.0,"p25":0.0,"p50":0.0,"p75":769.5,"p90":2161.2,"max":23581.0,"meannz":1417.18,"y0":2021.0,"y1":2025.0},{"key":"20801/GI020111","name":"1인당 기금 누적액(E/G)","path":"I. 기관운영 > 복리후생비 > 사내복지기금 > 조성현황 > 1인당 기금 누적액(E/G)","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":515.0,"ninst":103.0,"nzero":23.0,"mean":9586.44,"sd":24025.14,"min":0.0,"p25":1210.0,"p50":5989.0,"p75":14050.0,"p90":21441.8,"max":522265.0,"meannz":10034.59,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03020101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 학자금 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":940.0,"ninst":188.0,"nzero":478.0,"mean":262189.87,"sd":1110596.5,"min":0.0,"p25":0.0,"p50":0.0,"p75":73960.25,"p90":512282.1,"max":13355922.0,"meannz":533459.92,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03020201","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 학자금 > 유상지급(대부사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":940.0,"ninst":188.0,"nzero":485.0,"mean":423403.48,"sd":1524196.82,"min":0.0,"p25":0.0,"p50":0.0,"p75":166772.0,"p90":1039063.2,"max":17046473.0,"meannz":874723.68,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03030101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 주택자금 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":165.0,"ninst":33.0,"nzero":59.0,"mean":128865.81,"sd":324139.77,"min":0.0,"p25":0.0,"p50":10840.0,"p75":112306.0,"p90":345720.8,"max":2006952.0,"meannz":200593.0,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03030201","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 주택자금 > 유상지급(대부사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":380.0,"ninst":76.0,"nzero":103.0,"mean":2387919.78,"sd":5695932.99,"min":0.0,"p25":0.0,"p50":341500.0,"p75":2122900.0,"p90":6774045.8,"max":50798000.0,"meannz":3275846.62,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03040101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 의료비 및 건강검진비 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":1500.0,"ninst":300.0,"nzero":79.0,"mean":362257.29,"sd":888154.21,"min":0.0,"p25":19950.0,"p50":59578.0,"p75":275559.75,"p90":901523.1,"max":8271282.0,"meannz":382396.86,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03050201","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 생활안정자금 > 유상지급(대부사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":365.0,"ninst":73.0,"nzero":58.0,"mean":3418222.39,"sd":8126730.05,"min":0.0,"p25":169000.0,"p50":920000.0,"p75":2440000.0,"p90":8208696.0,"max":69066730.0,"meannz":4064010.34,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03060101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 경조비 및 유족위로금 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":1405.0,"ninst":281.0,"nzero":89.0,"mean":100784.69,"sd":385729.28,"min":0.0,"p25":1520.0,"p50":4500.0,"p75":43350.0,"p90":242704.2,"max":4518671.0,"meannz":107600.68,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03070101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 선택적복지제도 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":1585.0,"ninst":317.0,"nzero":78.0,"mean":1062903.99,"sd":3036385.15,"min":0.0,"p25":81955.0,"p50":191247.0,"p75":678587.0,"p90":2240111.4,"max":29655461.0,"meannz":1117918.26,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03080101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 기념품비 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":1370.0,"ninst":274.0,"nzero":175.0,"mean":165850.43,"sd":515409.01,"min":0.0,"p25":7312.5,"p50":28692.5,"p75":99005.75,"p90":345020.0,"max":5520400.0,"meannz":190138.14,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03090101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 행사지원비 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":1255.0,"ninst":251.0,"nzero":245.0,"mean":141073.7,"sd":675511.82,"min":0.0,"p25":1732.5,"p50":10460.0,"p75":44642.0,"p90":238332.2,"max":9672755.0,"meannz":175294.55,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03110101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 문화여가비 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":1325.0,"ninst":265.0,"nzero":159.0,"mean":186540.95,"sd":632117.44,"min":0.0,"p25":2723.0,"p50":10664.0,"p75":75526.0,"p90":429164.8,"max":6546339.0,"meannz":211978.35,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03120101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 재해보상 및 재해부조 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":410.0,"ninst":82.0,"nzero":101.0,"mean":381382.88,"sd":1024617.8,"min":0.0,"p25":187.75,"p50":13857.5,"p75":145996.75,"p90":1059382.9,"max":6072057.0,"meannz":506042.01,"y0":2021.0,"y1":2025.0},{"key":"20801/GI03130101","name":"소계","path":"I. 기관운영 > 복리후생비 > 항목별 복리후생비 > 기타 > 무상지급(용도사업) > 소계","unit":"천원","top":"I. 기관운영","grp":"복리후생비","n":1420.0,"ninst":284.0,"nzero":84.0,"mean":503362.04,"sd":2246714.56,"min":0.0,"p25":8086.5,"p50":38028.5,"p75":208274.5,"p90":1087056.7,"max":44169630.0,"meannz":535010.56,"y0":2021.0,"y1":2025.0},{"key":"21301/GI0101","name":"소송건수","path":"I. 기관운영 > 소송 및 소송대리인 현황 > 소송 현황 > 소송건수","unit":"건","top":"I. 기관운영","grp":"소송 및 소송대리인 현황","n":1914.0,"ninst":319.0,"nzero":840.0,"mean":55.33,"sd":410.01,"min":0.0,"p25":0.0,"p50":1.0,"p75":4.0,"p90":19.0,"max":7712.0,"meannz":98.6,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0101","name":"남성 사용자 수  ","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 육아휴직 사용자 수 및 사용률 > 남성 사용자 수  ","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2124.0,"ninst":354.0,"nzero":564.0,"mean":14.45,"sd":44.18,"min":0.0,"p25":0.0,"p50":3.0,"p75":11.0,"p90":33.0,"max":775.0,"meannz":19.68,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0102","name":"여성 사용자 수  ","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 육아휴직 사용자 수 및 사용률 > 여성 사용자 수  ","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2124.0,"ninst":354.0,"nzero":435.0,"mean":43.57,"sd":131.04,"min":0.0,"p25":2.0,"p50":10.0,"p75":30.0,"p90":75.0,"max":1631.0,"meannz":54.79,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0103","name":"남성 육아휴직 사용률","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 육아휴직 사용자 수 및 사용률 > 남성 육아휴직 사용률","unit":"%","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2124.0,"ninst":354.0,"nzero":564.0,"mean":23.78,"sd":22.59,"min":0.0,"p25":0.0,"p50":20.0,"p75":36.52,"p90":54.5,"max":100.0,"meannz":32.38,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0104","name":"여성 육아휴직 사용률","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 육아휴직 사용자 수 및 사용률 > 여성 육아휴직 사용률","unit":"%","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2124.0,"ninst":354.0,"nzero":435.0,"mean":57.28,"sd":33.81,"min":0.0,"p25":35.65,"p50":67.75,"p75":83.3,"p90":94.17,"max":100.0,"meannz":72.03,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0201","name":"출산휴가 사용자 수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 출산 휴가 사용자 수 및 사용률 > 출산휴가 사용자 수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2130.0,"ninst":355.0,"nzero":519.0,"mean":16.76,"sd":48.89,"min":0.0,"p25":1.0,"p50":4.0,"p75":11.0,"p90":30.0,"max":740.0,"meannz":22.16,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0202","name":"배우자 출산휴가 사용자 수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 출산 휴가 사용자 수 및 사용률 > 배우자 출산휴가 사용자 수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2130.0,"ninst":355.0,"nzero":620.0,"mean":16.22,"sd":50.61,"min":0.0,"p25":0.0,"p50":3.0,"p75":11.0,"p90":40.1,"max":862.0,"meannz":22.87,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0203","name":"배우자 출산휴가 법정일수 사용자수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 출산 휴가 사용자 수 및 사용률 > 배우자 출산휴가 법정일수 사용자수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2130.0,"ninst":355.0,"nzero":1542.0,"mean":5.4,"sd":29.62,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":9.0,"max":611.0,"meannz":19.56,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0204","name":"배우자 출산휴가 법정일수 사용률","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 출산 휴가 사용자 수 및 사용률 > 배우자 출산휴가 법정일수 사용률","unit":"%","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2130.0,"ninst":355.0,"nzero":1542.0,"mean":22.83,"sd":38.46,"min":0.0,"p25":0.0,"p50":0.0,"p75":52.78,"p90":100.0,"max":100.0,"meannz":82.7,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0301","name":"임신기 단축 근무제","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 임신기·육아기 단축 근무제 사용자 수 > 임신기 단축 근무제","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2118.0,"ninst":353.0,"nzero":595.0,"mean":15.22,"sd":50.69,"min":0.0,"p25":0.0,"p50":3.0,"p75":9.75,"p90":25.3,"max":981.0,"meannz":21.17,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0302","name":"육아기 단축 근무제","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 임신기·육아기 단축 근무제 사용자 수 > 육아기 단축 근무제","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2118.0,"ninst":353.0,"nzero":1043.0,"mean":15.14,"sd":98.74,"min":0.0,"p25":0.0,"p50":1.0,"p75":4.0,"p90":14.3,"max":2024.0,"meannz":29.83,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0303","name":"육아휴직 기사용인원","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 임신기·육아기 단축 근무제 사용자 수 > 육아휴직 기사용인원","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2118.0,"ninst":353.0,"nzero":1191.0,"mean":7.66,"sd":44.76,"min":0.0,"p25":0.0,"p50":0.0,"p75":2.0,"p90":9.0,"max":882.0,"meannz":17.5,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401010101","name":"인원수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 채용 > 정규직(일반정규직) > 인원수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":2048.0,"mean":0.29,"sd":3.04,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":65.0,"meannz":11.85,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401010102","name":"전일제 환산","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 채용 > 정규직(일반정규직) > 전일제 환산","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":2048.0,"mean":0.17,"sd":1.75,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":32.5,"meannz":6.95,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401010201","name":"인원수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 채용 > 정규직(무기계약직) > 인원수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1935.0,"mean":2.04,"sd":35.39,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1224.0,"meannz":25.95,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401010202","name":"전일제 환산","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 채용 > 정규직(무기계약직) > 전일제 환산","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1935.0,"mean":0.94,"sd":14.31,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":490.0,"meannz":11.99,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401010301","name":"인원수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 채용 > 비정규직 > 인원수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1668.0,"mean":7.62,"sd":60.48,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":4.0,"max":1127.0,"meannz":37.06,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401010302","name":"전일제 환산","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 채용 > 비정규직 > 전일제 환산","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1668.0,"mean":4.94,"sd":47.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":2.63,"max":1021.33,"meannz":24.0,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401010401","name":"인원수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 채용 > 계 > 인원수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1583.0,"mean":9.95,"sd":72.01,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":6.0,"max":1229.0,"meannz":40.43,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401010402","name":"전일제 환산","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 채용 > 계 > 전일제 환산","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1583.0,"mean":6.05,"sd":50.32,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":3.5,"max":1061.67,"meannz":24.57,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401020101","name":"인원수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 전환 > 정규직(일반정규직) > 인원수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1298.0,"mean":7.75,"sd":27.54,"min":0.0,"p25":0.0,"p50":0.0,"p75":2.0,"p90":13.0,"max":288.0,"meannz":20.29,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401020102","name":"전일제 환산","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 전환 > 정규직(일반정규직) > 전일제 환산","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1298.0,"mean":5.54,"sd":19.94,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.5,"p90":9.26,"max":235.59,"meannz":14.51,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401020201","name":"인원수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 전환 > 정규직(무기계약직) > 인원수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1643.0,"mean":1.36,"sd":5.72,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":3.0,"max":105.0,"meannz":6.24,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401020202","name":"전일제 환산","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 전환 > 정규직(무기계약직) > 전일제 환산","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1644.0,"mean":0.97,"sd":4.11,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":2.25,"max":78.75,"meannz":4.47,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401020301","name":"인원수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 전환 > 비정규직 > 인원수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1971.0,"mean":0.16,"sd":1.07,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":20.0,"meannz":2.66,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401020302","name":"전일제 환산","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 전환 > 비정규직 > 전일제 환산","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1971.0,"mean":0.12,"sd":0.81,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":15.63,"meannz":1.98,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401020401","name":"인원수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 전환 > 계 > 인원수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1220.0,"mean":9.25,"sd":30.34,"min":0.0,"p25":0.0,"p50":0.0,"p75":3.0,"p90":19.0,"max":299.0,"meannz":22.08,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0401020402","name":"전일제 환산","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 시간선택제 > 전환 > 계 > 전일제 환산","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1219.0,"mean":6.73,"sd":23.74,"min":0.0,"p25":0.0,"p50":0.0,"p75":2.25,"p90":13.78,"max":487.06,"meannz":16.05,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0402010101","name":"시차 출퇴근형(인원수)","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 탄력근무제(전체) > 시차 출퇴근형(인원수)","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":574.0,"mean":180.77,"sd":445.64,"min":0.0,"p25":0.0,"p50":46.0,"p75":134.25,"p90":440.1,"max":5029.0,"meannz":248.77,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0402010201","name":"근무시간 선택형(인원수)","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 탄력근무제(전체) > 근무시간 선택형(인원수)","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":947.0,"mean":232.32,"sd":781.13,"min":0.0,"p25":0.0,"p50":6.0,"p75":122.0,"p90":519.1,"max":10756.0,"meannz":423.13,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0402010301","name":"집약 근무형(인원수)","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 탄력근무제(전체) > 집약 근무형(인원수)","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1766.0,"mean":8.78,"sd":51.75,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":5.0,"max":878.0,"meannz":55.21,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0402010401","name":"계(인원수)","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 탄력근무제(전체) > 계(인원수)","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":435.0,"mean":421.87,"sd":1042.52,"min":0.0,"p25":19.0,"p50":92.5,"p75":311.0,"p90":1169.8,"max":12639.0,"meannz":532.09,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0403010101","name":"재량근무제(인원수)","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 재량근무제(전체) > 재량근무제(인원수)","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":2008.0,"mean":3.56,"sd":31.55,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":777.0,"meannz":81.33,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0404010101","name":"재택근무형(인원수)","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 원격근무제(전체) > 재택근무형(인원수)","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":920.0,"mean":197.34,"sd":825.81,"min":0.0,"p25":0.0,"p50":5.0,"p75":98.5,"p90":366.1,"max":16623.0,"meannz":351.2,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0404010201","name":"스마트워크근무형(인원수)","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 원격근무제(전체) > 스마트워크근무형(인원수)","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":1772.0,"mean":7.46,"sd":47.84,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":11.0,"max":1630.0,"meannz":47.78,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0404010301","name":"계(인원수)","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 유연근무현황 - 원격근무제(전체) > 계(인원수)","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2100.0,"ninst":350.0,"nzero":882.0,"mean":204.8,"sd":833.1,"min":0.0,"p25":0.0,"p50":7.0,"p75":117.0,"p90":384.1,"max":16623.0,"meannz":353.11,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0501","name":"남성","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 가족돌봄휴가 사용자수 > 남성","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2118.0,"ninst":353.0,"nzero":585.0,"mean":115.82,"sd":458.06,"min":0.0,"p25":0.0,"p50":14.0,"p75":62.0,"p90":289.3,"max":8410.0,"meannz":160.02,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0502","name":"여성","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 가족돌봄휴가 사용자수 > 여성","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2118.0,"ninst":353.0,"nzero":539.0,"mean":80.99,"sd":277.15,"min":0.0,"p25":0.0,"p50":13.0,"p75":45.0,"p90":120.3,"max":3489.0,"meannz":108.64,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0503","name":"합계","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 가족돌봄휴가 사용자수 > 합계","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2118.0,"ninst":353.0,"nzero":508.0,"mean":196.81,"sd":649.51,"min":0.0,"p25":1.0,"p50":29.0,"p75":114.0,"p90":458.3,"max":10003.0,"meannz":258.91,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0601","name":"남성","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 가족돌봄휴직 사용자수 > 남성","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":1944.0,"ninst":324.0,"nzero":1385.0,"mean":0.7,"sd":2.28,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":2.0,"max":35.0,"meannz":2.44,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0602","name":"여성","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 가족돌봄휴직 사용자수 > 여성","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":1944.0,"ninst":324.0,"nzero":1200.0,"mean":1.29,"sd":3.08,"min":0.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":3.0,"max":29.0,"meannz":3.36,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0603","name":"합계","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 가족돌봄휴직 사용자수 > 합계","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":1944.0,"ninst":324.0,"nzero":1026.0,"mean":1.99,"sd":4.74,"min":0.0,"p25":0.0,"p50":0.0,"p75":2.0,"p90":5.0,"max":56.0,"meannz":4.21,"y0":2021.0,"y1":2026.0},{"key":"21401/GI070101","name":"계","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 직장어린이집 운영 현황 > 직장어린이집 수 > 계","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":876.0,"ninst":146.0,"nzero":197.0,"mean":3.76,"sd":15.55,"min":0.0,"p25":1.0,"p50":1.0,"p75":2.0,"p90":3.0,"max":152.0,"meannz":4.85,"y0":2021.0,"y1":2026.0},{"key":"21401/GI070102","name":"직접설치","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 직장어린이집 운영 현황 > 직장어린이집 수 > 직접설치","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":876.0,"ninst":146.0,"nzero":816.0,"mean":0.09,"sd":0.34,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":2.0,"meannz":1.25,"y0":2021.0,"y1":2026.0},{"key":"21401/GI070103","name":"위탁운영","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 직장어린이집 운영 현황 > 직장어린이집 수 > 위탁운영","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":876.0,"ninst":146.0,"nzero":254.0,"mean":3.67,"sd":15.57,"min":0.0,"p25":0.0,"p50":1.0,"p75":2.0,"p90":3.0,"max":152.0,"meannz":5.17,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0801","name":"전년도 육아휴직 종료자 수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 육아휴직자의 직장 유지 현황 > 전년도 육아휴직 종료자 수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2112.0,"ninst":352.0,"nzero":1440.0,"mean":12.28,"sd":56.39,"min":0.0,"p25":0.0,"p50":0.0,"p75":4.0,"p90":21.0,"max":952.0,"meannz":38.61,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0802","name":"육아휴직 종료 후 퇴직자 수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 육아휴직자의 직장 유지 현황 > 육아휴직 종료 후 퇴직자 수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2112.0,"ninst":352.0,"nzero":1702.0,"mean":0.85,"sd":3.36,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":2.0,"max":50.0,"meannz":4.36,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0803","name":"육아휴직 종료 후 재직자 수","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 육아휴직자의 직장 유지 현황 > 육아휴직 종료 후 재직자 수","unit":"명","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2112.0,"ninst":352.0,"nzero":1446.0,"mean":11.44,"sd":53.73,"min":0.0,"p25":0.0,"p50":0.0,"p75":3.0,"p90":19.0,"max":929.0,"meannz":36.27,"y0":2021.0,"y1":2026.0},{"key":"21401/GI0804","name":"직장 재직률","path":"II. ESG운영 > 일가정 양립 지원제도 및 양성평등 운영 현황 > 육아휴직자의 직장 유지 현황 > 직장 재직률","unit":"%","top":"II. ESG운영","grp":"일가정 양립 지원제도 및 양성평등 운영 현황","n":2112.0,"ninst":352.0,"nzero":1446.0,"mean":28.73,"sd":42.87,"min":0.0,"p25":0.0,"p50":0.0,"p75":84.89,"p90":100.0,"max":100.0,"meannz":91.09,"y0":2021.0,"y1":2026.0},{"key":"31201/GI010101","name":"자산총계","path":"III. 경영성과 > 요약재무상태표 > 고유사업 > K-GAAP > 자산총계","unit":"백만원","top":"III. 경영성과","grp":"요약재무상태표","n":1005.0,"ninst":201.0,"nzero":35.0,"mean":131557.73,"sd":355841.11,"min":0.0,"p25":4972.0,"p50":16298.0,"p75":74214.0,"p90":316613.0,"max":3232784.0,"meannz":136304.65,"y0":2021.0,"y1":2025.0},{"key":"31201/GI010102","name":"부채총계","path":"III. 경영성과 > 요약재무상태표 > 고유사업 > K-GAAP > 부채총계","unit":"백만원","top":"III. 경영성과","grp":"요약재무상태표","n":1005.0,"ninst":201.0,"nzero":40.0,"mean":57955.33,"sd":184196.4,"min":0.0,"p25":893.0,"p50":5255.0,"p75":21686.0,"p90":98377.8,"max":1570908.0,"meannz":60357.62,"y0":2021.0,"y1":2025.0},{"key":"31201/GI010103","name":"자본총계","path":"III. 경영성과 > 요약재무상태표 > 고유사업 > K-GAAP > 자본총계","unit":"백만원","top":"III. 경영성과","grp":"요약재무상태표","n":1005.0,"ninst":201.0,"nzero":36.0,"mean":73602.44,"sd":212869.57,"min":-84621.0,"p25":1810.0,"p50":8049.0,"p75":49378.0,"p90":179468.0,"max":2129825.0,"meannz":76336.9,"y0":2021.0,"y1":2025.0},{"key":"31201/GI010201","name":"자산총계","path":"III. 경영성과 > 요약재무상태표 > 고유사업 > K-IFRS > 자산총계","unit":"백만원","top":"III. 경영성과","grp":"요약재무상태표","n":780.0,"ninst":156.0,"nzero":23.0,"mean":13834836.08,"sd":55400694.27,"min":0.0,"p25":23421.75,"p50":192330.5,"p75":1705625.75,"p90":16496776.2,"max":500692621.0,"meannz":14255181.17,"y0":2021.0,"y1":2025.0},{"key":"31201/GI010202","name":"부채총계","path":"III. 경영성과 > 요약재무상태표 > 고유사업 > K-IFRS > 부채총계","unit":"백만원","top":"III. 경영성과","grp":"요약재무상태표","n":780.0,"ninst":156.0,"nzero":23.0,"mean":10970076.64,"sd":48466955.37,"min":0.0,"p25":10180.5,"p50":88020.0,"p75":923358.25,"p90":10682527.3,"max":463836597.0,"meannz":11303381.48,"y0":2021.0,"y1":2025.0},{"key":"31201/GI010203","name":"자본총계","path":"III. 경영성과 > 요약재무상태표 > 고유사업 > K-IFRS > 자본총계","unit":"백만원","top":"III. 경영성과","grp":"요약재무상태표","n":780.0,"ninst":156.0,"nzero":28.0,"mean":2864759.43,"sd":9429636.09,"min":-3763011.0,"p25":4370.0,"p50":51046.5,"p75":552670.25,"p90":6381426.1,"max":75244444.0,"meannz":2971426.0,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010101","name":"매출","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 매출","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":35.0,"mean":94308.53,"sd":184825.79,"min":0.0,"p25":14635.0,"p50":29872.0,"p75":80865.5,"p90":229932.8,"max":1403569.0,"meannz":97746.86,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010102","name":"순매출","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 순매출","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":35.0,"mean":94136.86,"sd":184641.05,"min":0.0,"p25":14635.0,"p50":29872.0,"p75":80865.5,"p90":228105.4,"max":1403569.0,"meannz":97568.93,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010103","name":"매출원가","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 매출원가","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":333.0,"mean":69125.04,"sd":171910.19,"min":0.0,"p25":0.0,"p50":14485.0,"p75":59825.5,"p90":155085.6,"max":1558534.0,"meannz":103896.4,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010104","name":"판관비","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 판관비","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":126.0,"mean":30102.86,"sd":96541.96,"min":0.0,"p25":3930.0,"p50":9264.0,"p75":17730.0,"p90":45275.4,"max":1084340.0,"meannz":34467.6,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010105","name":"영업이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 영업이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":41.0,"mean":-4919.37,"sd":47837.22,"min":-819958.0,"p25":-1135.0,"p50":-135.0,"p75":448.5,"p90":2720.8,"max":211278.0,"meannz":-5130.79,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010106","name":"영업이익외 수익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 영업이익외 수익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":52.0,"mean":10423.53,"sd":48113.58,"min":0.0,"p25":64.5,"p50":371.0,"p75":1824.5,"p90":10471.4,"max":886021.0,"meannz":10998.32,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010107","name":"영업외 비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 영업외 비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":251.0,"mean":6179.15,"sd":24797.26,"min":0.0,"p25":0.0,"p50":57.0,"p75":990.0,"p90":7998.6,"max":283320.0,"meannz":8263.78,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010108","name":"법인세 비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 법인세 비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":719.0,"mean":280.66,"sd":2775.79,"min":-955.0,"p25":0.0,"p50":0.0,"p75":1.0,"p90":120.6,"max":56609.0,"meannz":1011.81,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010109","name":"총수익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 총수익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":35.0,"mean":104732.06,"sd":216402.02,"min":0.0,"p25":15003.0,"p50":30927.0,"p75":83490.0,"p90":285092.4,"max":1870960.0,"meannz":108550.42,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010110","name":"총비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 총비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":35.0,"mean":105610.71,"sd":219405.43,"min":0.0,"p25":14739.5,"p50":30157.0,"p75":84020.5,"p90":267089.4,"max":1831845.0,"meannz":109461.1,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010111","name":"당기순이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 당기순이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":76.0,"mean":-878.65,"sd":45352.61,"min":-704546.0,"p25":-404.5,"p50":0.0,"p75":667.5,"p90":3393.4,"max":718022.0,"meannz":-951.31,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010112","name":"매출액순이익률","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 매출액순이익률","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":91.0,"mean":-2.55,"sd":96.68,"min":-2895.97,"p25":-1.52,"p50":0.0,"p75":2.01,"p90":7.82,"max":636.63,"meannz":-2.8,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010113","name":"자기자본회전률","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 자기자본회전률","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":66.0,"mean":6976.5,"sd":100593.13,"min":-0.14,"p25":85.2,"p50":272.17,"p75":802.6,"p90":2426.42,"max":2249100.0,"meannz":7472.14,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010114","name":"이자비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약손익계산서 > 이자비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":995.0,"ninst":199.0,"nzero":774.0,"mean":311.77,"sd":1412.49,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":224.6,"max":16834.0,"meannz":1403.65,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010301","name":"수익(매출액)","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 수익(매출액)","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":27.0,"mean":2286018.79,"sd":12553964.36,"min":0.0,"p25":52620.0,"p50":194476.0,"p75":664572.0,"p90":1831069.6,"max":131914170.0,"meannz":2413808.66,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010302","name":"순매출","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 순매출","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":27.0,"mean":2283301.87,"sd":12554361.07,"min":0.0,"p25":52620.0,"p50":194476.0,"p75":643728.75,"p90":1831069.6,"max":131914170.0,"meannz":2410939.86,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010303","name":"매출원가","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 매출원가","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":86.0,"mean":2205991.55,"sd":12340860.56,"min":-650777.0,"p25":22376.0,"p50":113713.5,"p75":527557.0,"p90":1649116.4,"max":133716776.0,"meannz":2653433.23,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010304","name":"판관비","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 판관비","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":83.0,"mean":74363.38,"sd":208417.56,"min":0.0,"p25":4388.5,"p50":16939.5,"p75":49377.25,"p90":163233.1,"max":1830681.0,"meannz":88818.09,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010305","name":"영업이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 영업이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":31.0,"mean":5663.86,"sd":350141.99,"min":-3996225.0,"p25":-899.0,"p50":90.0,"p75":2118.0,"p90":12494.0,"max":4276417.0,"meannz":6030.41,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010306","name":"기타수익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 기타수익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":155.0,"mean":14581.12,"sd":133943.57,"min":0.0,"p25":0.0,"p50":55.0,"p75":424.25,"p90":2564.4,"max":2020697.0,"meannz":20947.53,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010307","name":"기타비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 기타비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":193.0,"mean":2782.31,"sd":18953.42,"min":0.0,"p25":0.0,"p50":11.0,"p75":444.5,"p90":1948.3,"max":290922.0,"meannz":4476.27,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010308","name":"기타이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 기타이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":243.0,"mean":551.96,"sd":4726.82,"min":-30412.0,"p25":0.0,"p50":0.0,"p75":81.5,"p90":708.7,"max":40000.0,"meannz":1054.3,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010309","name":"금융수익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 금융수익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":62.0,"mean":17273.32,"sd":139055.36,"min":0.0,"p25":31.0,"p50":299.5,"p75":1513.25,"p90":6075.1,"max":1993629.0,"meannz":19663.82,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010310","name":"금융원가","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 금융원가","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":76.0,"mean":8420.69,"sd":60240.92,"min":0.0,"p25":10.0,"p50":71.0,"p75":277.75,"p90":1506.6,"max":597024.0,"meannz":9895.28,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010311","name":"지분법대상기업관련 이익 등","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 지분법대상기업관련 이익 등","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":486.0,"mean":481.49,"sd":8278.97,"min":-1161.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":185215.0,"meannz":10231.75,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010312","name":"법인세비용차감전 순이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 법인세비용차감전 순이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":35.0,"mean":27348.75,"sd":437273.37,"min":-4002352.0,"p25":-375.5,"p50":383.0,"p75":4081.25,"p90":20357.4,"max":6532112.0,"meannz":29363.92,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010313","name":"법인세비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 법인세비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":222.0,"mean":1947.14,"sd":18220.6,"min":-142527.0,"p25":0.0,"p50":0.0,"p75":311.0,"p90":2875.0,"max":304748.0,"meannz":3448.06,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010314","name":"당기순이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 당기순이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":35.0,"mean":25401.61,"sd":437836.0,"min":-3859825.0,"p25":-356.75,"p50":291.5,"p75":3361.75,"p90":22255.9,"max":6530985.0,"meannz":27273.3,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010315","name":"기타포괄손익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 기타포괄손익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":73.0,"mean":624.42,"sd":10968.11,"min":-77613.0,"p25":-979.75,"p50":0.0,"p75":825.5,"p90":5014.4,"max":103617.0,"meannz":728.73,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010316","name":"총포괄손익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 총포괄손익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":35.0,"mean":26026.03,"sd":438575.86,"min":-3875889.0,"p25":-499.75,"p50":463.0,"p75":4384.0,"p90":23184.1,"max":6603803.0,"meannz":27943.74,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010317","name":"매출액순이익률","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 매출액순이익률","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":46.0,"mean":1.02,"sd":22.3,"min":-298.02,"p25":-0.23,"p50":0.2,"p75":1.73,"p90":5.85,"max":170.12,"meannz":1.13,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010318","name":"자기자본회전률","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 자기자본회전률","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":106.0,"mean":32861.52,"sd":263315.23,"min":-204362.73,"p25":37.34,"p50":386.04,"p75":1566.59,"p90":9227.67,"max":3283750.0,"meannz":41483.6,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010319","name":"이자비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약포괄손익계산서 > 이자비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":510.0,"ninst":102.0,"nzero":98.0,"mean":7184.25,"sd":51222.18,"min":0.0,"p25":4.0,"p50":77.0,"p75":318.25,"p90":1787.6,"max":566123.0,"meannz":8893.12,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010401","name":"수익(매출액)","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 수익(매출액)","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":5984805.53,"sd":14276005.99,"min":0.0,"p25":211791.0,"p50":756732.0,"p75":5340304.0,"p90":13573393.0,"max":97429346.0,"meannz":6135502.07,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010402","name":"순매출","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 순매출","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":5984805.53,"sd":14276005.99,"min":0.0,"p25":211791.0,"p50":756732.0,"p75":5340304.0,"p90":13573393.0,"max":97429346.0,"meannz":6135502.07,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010403","name":"매출원가","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 매출원가","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":22.0,"mean":5445021.52,"sd":13907657.3,"min":0.0,"p25":129048.0,"p50":610921.0,"p75":4552769.0,"p90":12240699.8,"max":100903594.0,"meannz":5900498.61,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010404","name":"판관비","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 판관비","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":14.0,"mean":246902.35,"sd":541526.99,"min":0.0,"p25":26478.0,"p50":106197.0,"p75":228233.0,"p90":397150.4,"max":3233977.0,"meannz":259657.45,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010405","name":"영업이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 영업이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":292881.66,"sd":2386457.59,"min":-32655153.0,"p25":-1382.0,"p50":23407.0,"p75":312929.0,"p90":1814432.0,"max":13490557.0,"meannz":300256.37,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010406","name":"기타수익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 기타수익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":33.0,"mean":61470.3,"sd":228774.67,"min":0.0,"p25":210.0,"p50":3775.0,"p75":28131.0,"p90":130910.8,"max":2162696.0,"meannz":69519.98,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010407","name":"기타비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 기타비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":34.0,"mean":79432.09,"sd":271088.22,"min":0.0,"p25":152.0,"p50":5774.0,"p75":34702.0,"p90":174362.4,"max":2016224.0,"meannz":90191.82,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010408","name":"기타이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 기타이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":41.0,"mean":160.93,"sd":116269.17,"min":-1247931.0,"p25":-357.0,"p50":40.0,"p75":2522.0,"p90":28602.0,"max":548719.0,"meannz":187.97,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010409","name":"금융수익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 금융수익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":32.0,"mean":126166.52,"sd":373096.9,"min":0.0,"p25":548.0,"p50":6391.0,"p75":94124.0,"p90":271370.4,"max":3448177.0,"meannz":142124.34,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010410","name":"금융원가","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 금융원가","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":34.0,"mean":265624.47,"sd":815088.19,"min":0.0,"p25":52.0,"p50":4142.0,"p75":179859.0,"p90":664228.0,"max":7535228.0,"meannz":301605.47,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010411","name":"지분법대상기업관련 이익 등","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 지분법대상기업관련 이익 등","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":136.0,"mean":10903.77,"sd":685531.97,"min":-9926416.0,"p25":0.0,"p50":0.0,"p75":1778.0,"p90":82379.6,"max":5231577.0,"meannz":20856.21,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010412","name":"법인세비용차감전 순이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 법인세비용차감전 순이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":146526.62,"sd":2518844.99,"min":-33843619.0,"p25":-1092.0,"p50":24416.0,"p75":184647.0,"p90":900531.8,"max":11586930.0,"meannz":150216.14,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010413","name":"법인세비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 법인세비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":21.0,"mean":29495.04,"sd":692505.91,"min":-9414511.0,"p25":0.0,"p50":2909.0,"p75":36807.0,"p90":204014.8,"max":2920274.0,"meannz":31841.23,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010414","name":"당기순이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 당기순이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":115829.0,"sd":1853483.49,"min":-24429108.0,"p25":-1234.0,"p50":17954.0,"p75":133194.0,"p90":643943.8,"max":8666656.0,"meannz":118745.56,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010415","name":"기타포괄손익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 기타포괄손익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":70241.86,"sd":410612.66,"min":-1050192.0,"p25":-5956.0,"p50":481.0,"p75":16375.0,"p90":156187.8,"max":3355811.0,"meannz":72010.54,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010416","name":"총포괄손익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 총포괄손익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":186070.86,"sd":1875365.94,"min":-23182239.0,"p25":-1437.0,"p50":18796.0,"p75":152929.0,"p90":1381335.8,"max":8521423.0,"meannz":190756.1,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010417","name":"지배기업의 소유주에게 귀속되는 당기순이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 지배기업의 소유주에게 귀속되는 당기순이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":118176.12,"sd":1844592.68,"min":-24466853.0,"p25":-1224.0,"p50":17413.0,"p75":133021.0,"p90":647903.4,"max":8544918.0,"meannz":121151.78,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010418","name":"비지배지분에 귀속되는 당기순이익","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 비지배지분에 귀속되는 당기순이익","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":157.0,"mean":-2347.12,"sd":60088.84,"min":-760451.0,"p25":0.0,"p50":0.0,"p75":20.0,"p90":6459.2,"max":130270.0,"meannz":-5226.01,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010419","name":"매출액순이익률","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 매출액순이익률","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":7.0,"mean":-5.52,"sd":75.46,"min":-861.5,"p25":-0.66,"p50":1.85,"p75":7.86,"p90":14.73,"max":141.43,"meannz":-5.66,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010420","name":"자기자본회전률","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 자기자본회전률","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":30.0,"mean":573.46,"sd":2719.27,"min":0.0,"p25":24.01,"p50":88.76,"p75":139.87,"p90":435.77,"max":35324.04,"meannz":640.92,"y0":2021.0,"y1":2025.0},{"key":"31301/GI010421","name":"이자비용","path":"III. 경영성과 > 요약손익계산서 > 고유사업 > 요약연결포괄손익계산서 > 이자비용","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":285.0,"ninst":57.0,"nzero":10.0,"mean":582986.52,"sd":1794667.53,"min":0.0,"p25":292.0,"p50":13681.0,"p75":163778.0,"p90":833942.4,"max":11537782.0,"meannz":604186.03,"y0":2021.0,"y1":2025.0},{"key":"31301/GI020208","name":"매출액순이익률","path":"III. 경영성과 > 요약손익계산서 > 기금계정 > 요약재정운용표 > 매출액순이익률","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":160.0,"ninst":32.0,"nzero":160.0,"mean":0.0,"sd":0.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":0.0,"meannz":null,"y0":2021.0,"y1":2025.0},{"key":"31301/GI020209","name":"자기자본회전률","path":"III. 경영성과 > 요약손익계산서 > 기금계정 > 요약재정운용표 > 자기자본회전률","unit":"백만원","top":"III. 경영성과","grp":"요약손익계산서","n":160.0,"ninst":32.0,"nzero":160.0,"mean":0.0,"sd":0.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":0.0,"meannz":null,"y0":2021.0,"y1":2025.0},{"key":"31401/GI0101","name":"수입합계","path":"III. 경영성과 > 수입지출현황 > 고유사업 > 수입합계","unit":"백만원","top":"III. 경영성과","grp":"수입지출현황","n":2088.0,"ninst":348.0,"nzero":21.0,"mean":2399330.48,"sd":11163062.57,"min":0.0,"p25":26041.75,"p50":81185.0,"p75":458052.25,"p90":2070618.5,"max":134555460.0,"meannz":2423706.84,"y0":2021.0,"y1":2026.0},{"key":"31401/GI0102","name":"지출합계","path":"III. 경영성과 > 수입지출현황 > 고유사업 > 지출합계","unit":"백만원","top":"III. 경영성과","grp":"수입지출현황","n":2088.0,"ninst":348.0,"nzero":23.0,"mean":2397942.76,"sd":11163221.64,"min":0.0,"p25":25987.25,"p50":79365.0,"p75":458052.25,"p90":2062249.4,"max":134555460.0,"meannz":2424651.08,"y0":2021.0,"y1":2026.0},{"key":"31401/GI0103","name":"정부순지원수입합계","path":"III. 경영성과 > 수입지출현황 > 고유사업 > 정부순지원수입합계","unit":"백만원","top":"III. 경영성과","grp":"수입지출현황","n":2088.0,"ninst":348.0,"nzero":315.0,"mean":328361.03,"sd":2518365.68,"min":0.0,"p25":6798.25,"p50":23231.5,"p75":80901.5,"p90":365364.0,"max":55475690.0,"meannz":386699.29,"y0":2021.0,"y1":2026.0},{"key":"31901/GI0101","name":"자회사","path":"III. 경영성과 > 투자 및 출자 현황 > 타법인 투 출자 현황 총괄표 > 자회사","unit":"개","top":"III. 경영성과","grp":"투자 및 출자 현황","n":585.0,"ninst":117.0,"nzero":175.0,"mean":5.92,"sd":13.92,"min":0.0,"p25":0.0,"p50":1.0,"p75":3.0,"p90":17.0,"max":93.0,"meannz":8.45,"y0":2021.0,"y1":2025.0},{"key":"31901/GI0102","name":"출자회사","path":"III. 경영성과 > 투자 및 출자 현황 > 타법인 투 출자 현황 총괄표 > 출자회사","unit":"개","top":"III. 경영성과","grp":"투자 및 출자 현황","n":585.0,"ninst":117.0,"nzero":156.0,"mean":9.87,"sd":44.88,"min":0.0,"p25":0.0,"p50":2.0,"p75":8.0,"p90":17.0,"max":558.0,"meannz":13.46,"y0":2021.0,"y1":2025.0},{"key":"31901/GI0103","name":"재출자회사","path":"III. 경영성과 > 투자 및 출자 현황 > 타법인 투 출자 현황 총괄표 > 재출자회사","unit":"개","top":"III. 경영성과","grp":"투자 및 출자 현황","n":585.0,"ninst":117.0,"nzero":497.0,"mean":2.82,"sd":13.84,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":1.6,"max":126.0,"meannz":18.73,"y0":2021.0,"y1":2025.0},{"key":"32001/GI0101","name":"출연액","path":"III. 경영성과 > 출연 현황 > 출연내역 > 출연액","unit":"백만원","top":"III. 경영성과","grp":"출연 현황","n":575.0,"ninst":115.0,"nzero":219.0,"mean":13599.28,"sd":71689.71,"min":0.0,"p25":0.0,"p50":27.3,"p75":963.5,"p90":7333.0,"max":724189.0,"meannz":21965.13,"y0":2021.0,"y1":2025.0},{"key":"32211/GI0101","name":"과세표준","path":"III. 경영성과 > 법인세정보 > 납부내역 > 과세표준","unit":"천원","top":"III. 경영성과","grp":"법인세정보","n":1690.0,"ninst":338.0,"nzero":408.0,"mean":-14000459.36,"sd":929388105.65,"min":-33548469667.0,"p25":-447366.25,"p50":0.0,"p75":676930.75,"p90":19297487.4,"max":7025691936.0,"meannz":-18456143.77,"y0":2021.0,"y1":2025.0},{"key":"32211/GI0102","name":"법인세산출세액","path":"III. 경영성과 > 법인세정보 > 납부내역 > 법인세산출세액","unit":"천원","top":"III. 경영성과","grp":"법인세정보","n":1690.0,"ninst":338.0,"nzero":956.0,"mean":9446489.45,"sd":72937970.67,"min":0.0,"p25":0.0,"p50":0.0,"p75":126871.75,"p90":3902938.6,"max":1746946318.0,"meannz":21750091.51,"y0":2021.0,"y1":2025.0},{"key":"32211/GI0103","name":"세액공제","path":"III. 경영성과 > 법인세정보 > 납부내역 > 세액공제","unit":"천원","top":"III. 경영성과","grp":"법인세정보","n":1690.0,"ninst":338.0,"nzero":1418.0,"mean":727279.78,"sd":5525646.96,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":111100.7,"max":151057704.0,"meannz":4518760.4,"y0":2021.0,"y1":2025.0},{"key":"32211/GI0104","name":"가산세","path":"III. 경영성과 > 법인세정보 > 납부내역 > 가산세","unit":"천원","top":"III. 경영성과","grp":"법인세정보","n":1690.0,"ninst":338.0,"nzero":1510.0,"mean":3625.56,"sd":46775.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":10.0,"max":1558210.0,"meannz":34039.96,"y0":2021.0,"y1":2025.0},{"key":"32211/GI0105","name":"결정세액","path":"III. 경영성과 > 법인세정보 > 납부내역 > 결정세액","unit":"천원","top":"III. 경영성과","grp":"법인세정보","n":1690.0,"ninst":338.0,"nzero":919.0,"mean":8721579.87,"sd":68658024.18,"min":-353.0,"p25":0.0,"p50":0.0,"p75":95525.75,"p90":3215031.4,"max":1595901122.0,"meannz":19117341.09,"y0":2021.0,"y1":2025.0},{"key":"63701/GI0204","name":"고용 휴직","path":"I. 기관운영 > 그밖의 복리후생제도 등의 운영현황 > 휴직급여 > 고용 휴직","unit":"천원","top":"I. 기관운영","grp":"그밖의 복리후생제도 등의 운영현황","n":925.0,"ninst":185.0,"nzero":925.0,"mean":0.0,"sd":0.0,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":0.0,"meannz":null,"y0":2021.0,"y1":2025.0},{"key":"70461/GI01010101","name":"소계","path":"II. ESG운영 > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 > 사고 사망자수 > 소계","unit":"명","top":"II. ESG운영","grp":"산업재해 사고사망자수 및 안전사고 사망자수(승인)","n":1675.0,"ninst":335.0,"nzero":1606.0,"mean":0.1,"sd":0.61,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":9.0,"meannz":2.33,"y0":2021.0,"y1":2025.0},{"key":"70461/GI01010102","name":"직영","path":"II. ESG운영 > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 > 사고 사망자수 > 직영","unit":"명","top":"II. ESG운영","grp":"산업재해 사고사망자수 및 안전사고 사망자수(승인)","n":1675.0,"ninst":335.0,"nzero":1660.0,"mean":0.01,"sd":0.13,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":2.0,"meannz":1.27,"y0":2021.0,"y1":2025.0},{"key":"70461/GI01010103","name":"도급","path":"II. ESG운영 > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 > 사고 사망자수 > 도급","unit":"명","top":"II. ESG운영","grp":"산업재해 사고사망자수 및 안전사고 사망자수(승인)","n":1675.0,"ninst":335.0,"nzero":1661.0,"mean":0.01,"sd":0.1,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":2.0,"meannz":1.07,"y0":2021.0,"y1":2025.0},{"key":"70461/GI01010104","name":"건설발주","path":"II. ESG운영 > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 > 사고 사망자수 > 건설발주","unit":"명","top":"II. ESG운영","grp":"산업재해 사고사망자수 및 안전사고 사망자수(승인)","n":1675.0,"ninst":335.0,"nzero":1624.0,"mean":0.08,"sd":0.56,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":9.0,"meannz":2.49,"y0":2021.0,"y1":2025.0},{"key":"70461/GI010201","name":"사망자수","path":"II. ESG운영 > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 산업재해 사고사망자수 및 안전사고 사망자수(승인) > 안전사고 > 사망자수","unit":"명","top":"II. ESG운영","grp":"산업재해 사고사망자수 및 안전사고 사망자수(승인)","n":1675.0,"ninst":335.0,"nzero":1674.0,"mean":0.0,"sd":0.02,"min":0.0,"p25":0.0,"p50":0.0,"p75":0.0,"p90":0.0,"max":1.0,"meannz":1.0,"y0":2021.0,"y1":2025.0}],"types":[["기타공공기관",264,161141],["준정부기관(위탁집행형)",49,88340],["공기업(준시장형)",16,73818],["공기업(시장형)",14,76347],["준정부기관(기금관리형)",12,32159]],"typeMedian":{"공기업(시장형)":2919.5,"공기업(준시장형)":2036.0,"기타공공기관":170.5,"준정부기관(기금관리형)":1467.5,"준정부기관(위탁집행형)":785.0},"ministry":{"문화체육관광부":34,"기후에너지환경부":33,"보건복지부":31,"국토교통부":31,"국무조정실":27,"과학기술정보통신부":26,"교육부":24,"산업통상부":20,"해양수산부":20,"농림축산식품부":13,"고용노동부":12,"중소벤처기업부":11,"금융위원회":7,"성평등가족부":6},"region":[["서울특별시",130,69847],["대전광역시",26,66727],["전라남도",16,48698],["강원도",12,45942],["경상북도",10,28221],["경기도",29,26319],["경상남도",13,26013],["울산광역시",9,20217],["부산광역시",22,19844],["전라북도",10,19498],["대구광역시",15,18385],["인천광역시",9,9290],["충청북도",15,8808],["충청남도",6,7551],["세종특별자치시",26,7148],["광주광역시",3,6020],["제주특별자치도",4,3278]],"founded_bins":{"~1959":12,"1960-79":40,"1980-89":38,"1990-99":48,"2000-09":102,"2010-19":89,"2020~":26},"govShare":{"준정부기관(위탁집행형)":76.3,"기타공공기관":73.1,"준정부기관(기금관리형)":6.0,"공기업(시장형)":0.0,"공기업(준시장형)":0.0},"empTS":{"2021":423071,"2022":430286,"2023":421512,"2024":423948,"2025":428550,"2026":431805},"revTS":{"2021":670.3,"2022":862.9,"2023":831.2,"2024":861.0,"2025":874.1,"2026":910.2},"govTS":{"2021":89.3,"2022":98.1,"2023":109.2,"2024":118.2,"2025":128.7,"2026":142.2},"topEmp":[["한국철도공사","공기업(준시장형)",32957],["한국전력공사","공기업(시장형)",23511],["국민건강보험공단","준정부기관(위탁집행형)",16495],["중소기업은행","기타공공기관",13494],["한국수력원자력(주)","공기업(시장형)",12805],["근로복지공단","준정부기관(기금관리형)",10684],["한국도로공사","공기업(시장형)",9048],["한국토지주택공사","공기업(준시장형)",9038],["서울대학교병원","기타공공기관",8762],["한국보훈복지의료공단","준정부기관(위탁집행형)",7607],["국민연금공단","준정부기관(기금관리형)",7539],["부산대학교병원","기타공공기관",7138]],"labelAll":{"정치권":558,"관료":3769,"군검경":306,"내부승진":1455,"민간전문가":5669,"기타":64},"labelPos":{"비상임감사":{"정치권":16,"관료":71,"군검경":32,"내부승진":24,"민간전문가":539,"기타":1},"비상임기관장":{"정치권":5,"관료":6,"군검경":0,"내부승진":5,"민간전문가":26,"기타":0},"비상임이사":{"정치권":285,"관료":2996,"군검경":215,"내부승진":637,"민간전문가":4490,"기타":60},"비상임이사(감사위원)":{"정치권":14,"관료":27,"군검경":6,"내부승진":2,"민간전문가":105,"기타":2},"상임감사":{"정치권":70,"관료":49,"군검경":13,"내부승진":22,"민간전문가":72,"기타":1},"상임기관장":{"정치권":90,"관료":286,"군검경":25,"내부승진":162,"민간전문가":294,"기타":0},"상임이사":{"정치권":54,"관료":320,"군검경":7,"내부승진":601,"민간전문가":129,"기타":0},"상임이사(감사위원)":{"정치권":24,"관료":14,"군검경":8,"내부승진":2,"민간전문가":14,"기타":0}},"labelType":{"공기업(시장형)":{"정치권":74,"관료":78,"군검경":18,"내부승진":142,"민간전문가":202,"기타":5},"공기업(준시장형)":{"정치권":60,"관료":105,"군검경":14,"내부승진":152,"민간전문가":218,"기타":4},"기타공공기관":{"정치권":289,"관료":2760,"군검경":232,"내부승진":732,"민간전문가":4373,"기타":46},"준정부기관(기금관리형)":{"정치권":44,"관료":140,"군검경":8,"내부승진":105,"민간전문가":209,"기타":2},"준정부기관(위탁집행형)":{"정치권":91,"관료":686,"군검경":34,"내부승진":324,"민간전문가":667,"기타":7}},"labelYear":{"2018":{"정치권":47,"관료":121,"군검경":18,"내부승진":94,"민간전문가":621,"기타":5},"2019":{"정치권":39,"관료":177,"군검경":13,"내부승진":113,"민간전문가":486,"기타":5},"2020":{"정치권":51,"관료":396,"군검경":40,"내부승진":177,"민간전문가":642,"기타":3},"2021":{"정치권":93,"관료":592,"군검경":48,"내부승진":220,"민간전문가":957,"기타":8},"2022":{"정치권":82,"관료":606,"군검경":33,"내부승진":160,"민간전문가":596,"기타":12},"2023":{"정치권":90,"관료":550,"군검경":64,"내부승진":240,"민간전문가":751,"기타":9},"2024":{"정치권":56,"관료":499,"군검경":50,"내부승진":175,"민간전문가":645,"기타":6},"2025":{"정치권":43,"관료":545,"군검경":24,"내부승진":148,"민간전문가":412,"기타":9},"2026":{"정치권":48,"관료":266,"군검경":13,"내부승진":113,"민간전문가":424,"기타":5}},"tenure_dist":{"1년":133,"2년":4169,"3년":3710,"4년":288,"5년":36,"6년":119,"기타":64,"미기재":3302},"midExit":{"관료":[178,3769],"군검경":[49,306],"기타":[5,64],"내부승진":[156,1455],"민간전문가":[469,5669],"정치권":[75,558]},"gender":{"2021":[13465,3749],"2022":[10382,2933],"2023":[11640,3128],"2024":[11486,3010],"2025":[9953,2386],"2026":[8628,2031]},"appt":{"2018":906,"2019":833,"2020":1309,"2021":1918,"2022":1489,"2023":1704,"2024":1431,"2025":1181,"2026":869},"ssYear":{"2021":{"기관":333,"건수":117006,"총액조원":17.41},"2022":{"기관":336,"건수":122096,"총액조원":19.66},"2023":{"기관":334,"건수":124300,"총액조원":21.13},"2024":{"기관":341,"건수":122159,"총액조원":24.34},"2025":{"기관":342,"건수":129341,"총액조원":23.48},"2026":{"기관":344,"건수":29337,"총액조원":4.87}},"ssType":[["공기업(시장형)",14,62346,57.71],["공기업(준시장형)",16,113906,18.2],["기타공공기관",257,283681,17.94],["준정부기관(위탁집행형)",48,153720,13.36],["준정부기관(기금관리형)",12,30586,3.67]],"pfYear2":{"2018":[9,27],"2019":[36,55],"2020":[1486,250],"2021":[2064,668],"2022":[1852,681],"2023":[1485,500],"2024":[1894,506],"2025":[1931,404],"2026":[21,50]},"pfType":{"공기업(시장형)":[1446,183],"공기업(준시장형)":[2117,221],"기타공공기관":[3349,1789],"준정부기관(기금관리형)":[1082,231],"준정부기관(위탁집행형)":[2807,723]},"pf_top_inst":{"한국토지주택공사":840,"한국도로공사":622,"국민건강보험공단":500,"국민연금공단":447,"한국철도공사":442,"건강보험심사평가원":376,"인천국제공항공사":341,"주택도시보증공사":305,"국가철도공단":269,"국가아동권리보장원":228,"한국공항공사":224,"한국교통안전공단":206}}</script>
+<script>
+(function(){
+"use strict";
+const D=JSON.parse(document.getElementById('alio-data').textContent);
+const NS="http://www.w3.org/2000/svg";
+const fmt=n=>Number(n).toLocaleString('ko-KR');
+const fmt1=n=>Number(n).toLocaleString('ko-KR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const fmtSm=n=>{const a=Math.abs(n); if(a>=1e8)return (n/1e8).toFixed(1)+'억'; if(a>=1e4)return (n/1e4).toFixed(1)+'만'; if(a>=100)return fmt(Math.round(n)); return fmt1(n);};
+
+const LB=D.LB||["정치권","관료","군검경","내부승진","민간전문가","기타"];
+const SC=["var(--s1)","var(--s2)","var(--s3)","var(--s4)","var(--s5)","var(--s6)"];
+const LCOL={}; LB.forEach((l,i)=>LCOL[l]=SC[i]);
+
+/* ── theme toggle ── */
+const btn=document.getElementById('themeBtn');
+btn.addEventListener('click',()=>{
+  const cur=document.documentElement.getAttribute('data-theme');
+  const sysDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = cur ? (cur==='dark'?'light':'dark') : (sysDark?'light':'dark');
+  document.documentElement.setAttribute('data-theme',next);
+  try{localStorage.setItem('alio-theme',next);}catch(e){}
+});
+try{const t=localStorage.getItem('alio-theme'); if(t) document.documentElement.setAttribute('data-theme',t);}catch(e){}
+
+/* ── tooltip ── */
+const tip=document.getElementById('tip');
+function showTip(h,e){tip.innerHTML=h;tip.style.opacity=1;moveTip(e);}
+function moveTip(e){const r=tip.getBoundingClientRect();
+  let x=e.clientX+14,y=e.clientY+14;
+  if(x+r.width>innerWidth-8)x=e.clientX-r.width-14;
+  if(y+r.height>innerHeight-8)y=e.clientY-r.height-14;
+  tip.style.left=x+'px';tip.style.top=y+'px';}
+function hideTip(){tip.style.opacity=0;}
+function bind(el,h){el.classList.add('hit');
+  el.addEventListener('mouseenter',e=>showTip(h,e));
+  el.addEventListener('mousemove',moveTip);
+  el.addEventListener('mouseleave',hideTip);}
+const ttRow=(c,k,v)=>`<div class="tr"><span class="tk">${c?`<i style="background:${c}"></i>`:''}${k}</span><span>${v}</span></div>`;
+
+/* ── svg ── */
+function svg(w,h,label){const s=document.createElementNS(NS,'svg');
+  s.setAttribute('viewBox',`0 0 ${w} ${h}`);s.setAttribute('width',w);s.setAttribute('height',h);
+  s.setAttribute('role','img'); if(label)s.setAttribute('aria-label',label); return s;}
+function el(p,t,a){const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);p.appendChild(n);return n;}
+function txt(p,x,y,s,cls,anchor){const n=el(p,'text',{x,y,class:cls||'lbl'});
+  if(anchor)n.setAttribute('text-anchor',anchor);n.textContent=s;return n;}
+function mount(id,s){const c=document.getElementById(id);if(c)c.appendChild(s);}
+function hbarPath(x,y,w,h,r){r=Math.min(r,w,h/2);
+  return `M${x},${y} H${x+w-r} A${r},${r} 0 0 1 ${x+w},${y+r} V${y+h-r} A${r},${r} 0 0 1 ${x+w-r},${y+h} H${x} Z`;}
+function niceTicks(max,n){if(max<=0)return[0,1];
+  const raw=max/n,mag=Math.pow(10,Math.floor(Math.log10(raw)));const nm=raw/mag;
+  const step=(nm<=1?1:nm<=2?2:nm<=2.5?2.5:nm<=5?5:10)*mag;const out=[];
+  for(let v=0;v<=max*1.0001+step*.5;v+=step)out.push(+v.toFixed(6));
+  if(out[out.length-1]<max)out.push(+(out[out.length-1]+step).toFixed(6));return out;}
+
+function hbar(id,rows,o){o=o||{};
+  const labW=o.labW||150,rowH=o.rowH||24,gap=6,pad=8,W=o.W||620,plotW=W-labW-(o.valW||58);
+  const s=svg(W,rows.length*(rowH+gap)+pad*2,o.aria);
+  const max=Math.max(...rows.map(r=>r[1]));
+  rows.forEach((r,i)=>{const y=pad+i*(rowH+gap);
+    txt(s,labW-10,y+rowH/2+4,r[0],'lbl','end');
+    const w=Math.max(2,plotW*r[1]/max);
+    const p=el(s,'path',{d:hbarPath(labW,y,w,rowH,4),style:`fill:${r[2]||'var(--s2)'}`});
+    bind(p,`<div class="tt">${r[0]}</div>${ttRow(r[2]||'var(--s2)',o.unit||'값',fmt(r[1])+(o.suffix||''))}${r[3]||''}`);
+    txt(s,labW+w+8,y+rowH/2+4,o.fmtV?o.fmtV(r[1]):fmt(r[1]),'val');});
+  mount(id,s);}
+
+function pairBar(id,rows,o){
+  const labW=o.labW||150,W=o.W||620,pad=8,rowH=11,sub=5,gap=13,plotW=W-labW-72;
+  const s=svg(W,rows.length*(rowH*2+sub+gap)+pad*2+16,o.aria);
+  const m1=Math.max(...rows.map(r=>r[1])),m2=Math.max(...rows.map(r=>r[2]));
+  txt(s,labW,12,o.k1,'ax'); txt(s,labW+plotW/2+40,12,o.k2,'ax');
+  rows.forEach((r,i)=>{const y=pad+16+i*(rowH*2+sub+gap);
+    txt(s,labW-10,y+rowH+2,r[0],'lbl','end');
+    const w1=Math.max(2,plotW*r[1]/m1),w2=Math.max(2,plotW*r[2]/m2);
+    const b1=el(s,'path',{d:hbarPath(labW,y,w1,rowH,3),style:'fill:var(--s2)'});
+    const b2=el(s,'path',{d:hbarPath(labW,y+rowH+sub,w2,rowH,3),style:'fill:var(--s4)'});
+    const tt=`<div class="tt">${r[0]}</div>${ttRow('var(--s2)',o.k1,fmt(r[1]))}${ttRow('var(--s4)',o.k2,fmt(r[2]))}`;
+    bind(b1,tt);bind(b2,tt);
+    txt(s,labW+w1+7,y+rowH-1,fmt(r[1]),'val');
+    txt(s,labW+w2+7,y+rowH*2+sub-1,fmt(r[2]),'val');});
+  mount(id,s);}
+
+function stack100(id,rows,cats,o){o=o||{};
+  const labW=o.labW||140,W=o.W||620,pad=8,rowH=o.rowH||26,gap=9,plotW=W-labW-56;
+  const s=svg(W,rows.length*(rowH+gap)+pad*2,o.aria);
+  rows.forEach((r,i)=>{const y=pad+i*(rowH+gap);
+    const tot=cats.reduce((a,c)=>a+(r[1][c]||0),0);
+    txt(s,labW-10,y+rowH/2+4,r[0],'lbl','end');
+    let x=labW;
+    cats.forEach(c=>{const v=r[1][c]||0;if(!v)return;const w=plotW*v/tot;
+      const seg=el(s,'rect',{x,y,width:Math.max(0,w-2),height:rowH,rx:1.5,style:`fill:${LCOL[c]}`});
+      bind(seg,`<div class="tt">${r[0]}</div>${ttRow(LCOL[c],c,fmt(v)+'건 · '+(100*v/tot).toFixed(1)+'%')}${ttRow('','합계',fmt(tot))}`);
+      if(w>34)txt(s,x+w/2-1,y+rowH/2+4,(100*v/tot).toFixed(0)+'%','valIn','middle').setAttribute('style','fill:#fff');
+      x+=w;});
+    txt(s,W-6,y+rowH/2+4,fmt(tot),'val','end');});
+  mount(id,s);}
+
+function colStack100(id,years,dat,cats,o){o=o||{};
+  const W=o.W||620,H=o.H||250,padL=34,padR=8,padT=22,padB=26;
+  const s=svg(W,H,o.aria),plotW=W-padL-padR,plotH=H-padT-padB;
+  const bw=Math.min(46,plotW/years.length-10);
+  [0,25,50,75,100].forEach(p=>{const y=padT+plotH*(1-p/100);
+    el(s,'line',{x1:padL,x2:W-padR,y1:y,y2:y,class:'grid-l'});
+    txt(s,padL-7,y+3.5,p+'%','ax','end');});
+  years.forEach((yr,i)=>{const cx=padL+plotW*(i+.5)/years.length,x=cx-bw/2;
+    const tot=cats.reduce((a,c)=>a+(dat[yr][c]||0),0);let acc=0;
+    cats.forEach(c=>{const v=dat[yr][c]||0;if(!v)return;
+      const h=plotH*v/tot,y=padT+plotH-acc-h;
+      const seg=el(s,'rect',{x,y,width:bw,height:Math.max(0,h-2),rx:1.5,style:`fill:${LCOL[c]}`});
+      bind(seg,`<div class="tt">${yr}년 임명</div>${ttRow(LCOL[c],c,fmt(v)+'건 · '+(100*v/tot).toFixed(1)+'%')}${ttRow('','합계',fmt(tot))}`);
+      if(h>20&&bw>30)txt(s,cx,y+h/2+3.5,(100*v/tot).toFixed(0),'valIn','middle').setAttribute('style','fill:#fff');
+      acc+=h;});
+    txt(s,cx,H-9,String(yr),'ax','middle');
+    txt(s,cx,padT-7,fmt(tot),'val','middle');});
+  mount(id,s);}
+
+function colStack(id,keys,series,o){o=o||{};
+  const W=o.W||620,H=o.H||240,padL=46,padR=8,padT=16,padB=26;
+  const s=svg(W,H,o.aria),plotW=W-padL-padR,plotH=H-padT-padB;
+  const tots=keys.map(k=>series.reduce((a,sr)=>a+(sr.v[k]||0),0));
+  const ticks=niceTicks(Math.max(...tots),4),top=ticks[ticks.length-1];
+  ticks.forEach(t=>{const y=padT+plotH*(1-t/top);
+    el(s,'line',{x1:padL,x2:W-padR,y1:y,y2:y,class:'grid-l'});
+    txt(s,padL-7,y+3.5,o.fmtY?o.fmtY(t):fmt(t),'ax','end');});
+  const bw=Math.min(40,plotW/keys.length-9);
+  keys.forEach((k,i)=>{const cx=padL+plotW*(i+.5)/keys.length,x=cx-bw/2;let acc=0;
+    let rows='';series.forEach(sr=>{rows+=ttRow(sr.color,sr.name,(o.fmtT?o.fmtT(sr.v[k]||0):fmt(sr.v[k]||0)));});
+    series.forEach(sr=>{const v=sr.v[k]||0;if(!v)return;
+      const h=plotH*v/top,y=padT+plotH-acc-h;
+      const seg=el(s,'rect',{x,y,width:bw,height:Math.max(0,h-2),rx:1.5,style:`fill:${sr.color}`});
+      bind(seg,`<div class="tt">${k}${o.kSuffix||''}</div>${rows}${series.length>1?ttRow('','합계',fmt(tots[i])):''}`);
+      acc+=h;});
+    txt(s,cx,H-9,String(k),'ax','middle');});
+  el(s,'line',{x1:padL,x2:W-padR,y1:padT+plotH,y2:padT+plotH,class:'base-l'});
+  mount(id,s);}
+
+function lineChart(id,keys,series,o){o=o||{};
+  const W=o.W||620,H=o.H||210,padL=o.padL||52,padR=o.padR||50,padT=14,padB=26;
+  const s=svg(W,H,o.aria),plotW=W-padL-padR,plotH=H-padT-padB;
+  const all=series.flatMap(sr=>keys.map(k=>sr.v[k])).filter(v=>v!=null);
+  const rawMax=Math.max(...all),rawMin=Math.min(...all);
+  const min=o.zero===false?rawMin-(rawMax-rawMin)*0.25:0;
+  const t=niceTicks(rawMax-min,4),top=min+t[t.length-1];
+  const X=i=>padL+(keys.length===1?plotW/2:plotW*i/(keys.length-1));
+  const Y=v=>padT+plotH*(1-(v-min)/(top-min));
+  t.forEach(tv=>{const y=Y(min+tv);
+    el(s,'line',{x1:padL,x2:W-padR,y1:y,y2:y,class:'grid-l'});
+    txt(s,padL-7,y+3.5,o.fmtY?o.fmtY(min+tv):fmt(Math.round(min+tv)),'ax','end');});
+  keys.forEach((k,i)=>txt(s,X(i),H-9,String(k),'ax','middle'));
+  series.forEach(sr=>{const pts=keys.map((k,i)=>[X(i),Y(sr.v[k])]);
+    el(s,'polyline',{points:pts.map(p=>p.join(',')).join(' '),fill:'none',
+      style:`stroke:${sr.color}`,'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'});
+    pts.forEach(p=>el(s,'circle',{cx:p[0],cy:p[1],r:4.5,style:`fill:${sr.color}`,stroke:'var(--card)','stroke-width':2}));
+    const last=pts[pts.length-1];
+    txt(s,last[0]+9,last[1]+4,sr.name,'val').setAttribute('style',`fill:${sr.color};font-weight:600`);});
+  keys.forEach((k,i)=>{let rows='';
+    series.forEach(sr=>{rows+=ttRow(sr.color,sr.name,(o.fmtT?o.fmtT(sr.v[k]):fmt(sr.v[k])));});
+    const hw=Math.max(18,plotW/keys.length);
+    const hit=el(s,'rect',{x:X(i)-hw/2,y:padT,width:hw,height:plotH,fill:'transparent'});
+    bind(hit,`<div class="tt">${k}${o.kSuffix||''}</div>${rows}`);});
+  el(s,'line',{x1:padL,x2:W-padR,y1:padT+plotH,y2:padT+plotH,class:'base-l'});
+  mount(id,s);}
+
+function table(id,head,rows){const c=document.getElementById(id);if(!c)return;
+  const t=document.createElement('table');
+  t.innerHTML='<thead><tr>'+head.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'+
+    rows.map(r=>'<tr>'+r.map(x=>`<td>${x}</td>`).join('')+'</tr>').join('')+'</tbody>';
+  c.appendChild(t);}
+function legend2(id,items){const c=document.getElementById(id);if(!c)return;
+  c.innerHTML=items.map(k=>`<span><i style="background:${k[1]}"></i>${k[0]}</span>`).join('');}
+const lbLegend=LB.map(l=>[l,LCOL[l]]);
+
+/* ══ render ══ */
+hbar('c-boards',Object.entries(D.boardLabels).map(([k,v])=>[k,v,'var(--s2)']),
+  {labW:230,W:660,unit:'레코드',rowH:20,aria:'게시판 9종의 수집 레코드 수. 국회 지적이 22,373건으로 가장 많고 연구보고서가 115건으로 가장 적다.'});
+hbar('c-itemtop',Object.entries(D.item_top_counts).map(([k,v])=>[k,v,'var(--s2)']),
+  {labW:110,W:400,unit:'항목',rowH:26,aria:'통계항목 대분류별 개수. 기관운영 333, 경영성과 145, ESG운영 81.'});
+
+table('t-outputs',['산출물','관측 단위','행수','연도','내용'],
+  D.outputs.map(r=>[`<span class="mono" style="font-size:11.5px">${r[0]}</span>`,r[1],r[2],`<span class="mono">${r[3]}</span>`,`<span style="color:var(--ink-2)">${r[4]}</span>`]));
+
+table('t-core',['변수','단위','n','기관','0값','평균','표준편차','p25','중앙값','p75','p90','최대'],
+  D.core.map(r=>[`<b>${r.label}</b> <span style="color:var(--ink-3);font-size:11px">${r.grp}</span>`,
+    `<span class="mono" style="font-size:11px">${r.unit}</span>`,fmt(r.n),fmt(r.ninst),fmt(r.nzero),
+    fmtSm(r.mean),fmtSm(r.sd),fmtSm(r.p25),fmtSm(r.p50),fmtSm(r.p75),fmtSm(r.p90),fmtSm(r.max)]));
+
+pairBar('c-type',D.types,{labW:160,W:620,k1:'기관 수',k2:'2026 임직원(명)',
+  aria:'기관유형별 기관 수와 임직원 합계. 기타공공기관은 264개로 개수가 가장 많으나 임직원 합계는 161,141명으로 개수 비중만큼 크지 않다.'});
+table('t-type',['기관유형','기관 수','임직원 합계','기관당 중앙값'],
+  D.types.map(r=>[r[0],fmt(r[1]),fmt(r[2]),fmt1(D.typeMedian[r[0]])]));
+hbar('c-ministry',Object.entries(D.ministry).map(([k,v])=>[k,v,'var(--s2)']),
+  {labW:140,W:560,unit:'기관',rowH:17,aria:'주무부처별 기관 수 상위 14개. 문화체육관광부 34개가 가장 많다.'});
+pairBar('c-region',D.region,{labW:120,W:640,k1:'기관 수',k2:'2026 임직원(명)',
+  aria:'시·도별 기관 수와 임직원 합계. 서울은 기관 130개에 임직원 69,847명, 대전은 기관 26개에 66,727명으로 두 지표가 어긋난다.'});
+table('t-region',['시·도','기관 수','임직원 합계','기관당 평균'],
+  D.region.map(r=>[r[0],fmt(r[1]),fmt(r[2]),fmt(Math.round(r[2]/r[1]))]));
+hbar('c-founded',Object.entries(D.founded_bins).map(([k,v])=>[k,v,'var(--s2)']),
+  {labW:78,W:400,unit:'기관',rowH:20,aria:'설립연도 구간별 기관 수. 2000년대가 102개로 최다.'});
+hbar('c-govshare',Object.entries(D.govShare).map(([k,v])=>[k,v,v>50?'var(--s1)':(v>0?'var(--s3)':'var(--s4)')]),
+  {labW:168,W:460,unit:'중앙값',suffix:'%',rowH:22,fmtV:v=>fmt1(v)+'%',
+   aria:'기관유형별 정부순지원 비중 중앙값. 위탁집행형 76.3%, 기타공공기관 73.1%, 기금관리형 6.0%, 공기업 두 유형은 0%.'});
+lineChart('c-emp-ts',[2021,2022,2023,2024,2025,2026],[{name:'임직원',v:D.empTS,color:'var(--s2)'}],
+  {zero:false,padR:58,kSuffix:'년',fmtY:v=>fmt(Math.round(v)),fmtT:v=>fmt(v)+'명',
+   aria:'임직원 총계 시계열. 2021년 423,071명에서 2026년 431,805명으로 소폭 증가.'});
+lineChart('c-fin-ts',[2021,2022,2023,2024,2025,2026],
+  [{name:'수입',v:D.revTS,color:'var(--s2)'},{name:'정부지원',v:D.govTS,color:'var(--s4)'}],
+  {padR:70,kSuffix:'년',fmtY:v=>fmt(Math.round(v)),fmtT:v=>fmt1(v)+'조원',
+   aria:'수입 합계와 정부순지원 시계열. 수입은 670조에서 910조, 정부지원은 89조에서 142조로 증가.'});
+table('t-topemp',['#','기관','유형','임직원 (2026)'],
+  D.topEmp.map((r,i)=>[String(i+1),`<b>${r[0]}</b>`,`<span style="color:var(--ink-2)">${r[1]}</span>`,fmt(r[2])]));
+
+/* 임원 */
+const totSpell=Object.values(D.labelAll).reduce((a,b)=>a+b,0);
+hbar('c-label-all',LB.map(l=>[l,D.labelAll[l],LCOL[l]]),
+  {labW:88,W:640,valW:130,unit:'spell',rowH:26,fmtV:v=>fmt(v)+'  ('+(100*v/totSpell).toFixed(1)+'%)',
+   aria:'임명 spell의 정치성 범주 분포. 민간전문가 5,669건 48%, 관료 3,769건 32%, 내부승진 1,455건 12%, 정치권 558건 4.7%, 군검경 306건 2.6%, 기타 64건.'});
+['lg-1','lg-2','lg-3'].forEach(id=>legend2(id,lbLegend));
+legend2('lg-5',[['국회 지적','var(--s2)'],['감사원 지적','var(--s1)']]);
+legend2('lg-6',[['국회 지적','var(--s2)'],['감사원 지적','var(--s1)']]);
+
+const posOrder=["상임이사(감사위원)","상임감사","비상임기관장","상임기관장","비상임이사(감사위원)","상임이사","비상임이사","비상임감사"];
+stack100('c-label-pos',posOrder.map(p=>[p,D.labelPos[p]]),LB,{labW:132,W:640,rowH:24,
+  aria:'직위별 정치성 구성. 상임이사(감사위원) 38.7%, 상임감사 30.8%가 정치권 출신인 반면 비상임이사는 3.3%에 그친다.'});
+table('t-label-pos',['직위',...LB,'합계'],posOrder.map(p=>{const r=D.labelPos[p];
+  const t=LB.reduce((a,c)=>a+r[c],0);return [p,...LB.map(c=>fmt(r[c])),`<b>${fmt(t)}</b>`];}));
+
+const typeOrder=["공기업(시장형)","공기업(준시장형)","준정부기관(기금관리형)","준정부기관(위탁집행형)","기타공공기관"];
+stack100('c-label-type',typeOrder.map(p=>[p,D.labelType[p]]),LB,{labW:150,W:600,rowH:26,
+  aria:'기관유형별 정치성 구성. 공기업 시장형은 정치권 14.3%, 기타공공기관은 3.4%.'});
+table('t-label-type',['기관유형',...LB,'합계'],typeOrder.map(p=>{const r=D.labelType[p];
+  const t=LB.reduce((a,c)=>a+r[c],0);return [p,...LB.map(c=>fmt(r[c])),`<b>${fmt(t)}</b>`];}));
+
+const yrs=[2018,2019,2020,2021,2022,2023,2024,2025,2026];
+colStack100('c-label-year',yrs,D.labelYear,LB,{W:600,H:270,
+  aria:'임명연도별 정치성 구성. 관료 비율이 2018년 13%에서 2025년 46%로 상승하나 좌측절단 편의가 있다.'});
+table('t-label-year',['임명연도',...LB,'합계'],yrs.map(y=>{const r=D.labelYear[y];
+  const t=LB.reduce((a,c)=>a+r[c],0);return [String(y),...LB.map(c=>fmt(r[c])),`<b>${fmt(t)}</b>`];}));
+
+hbar('c-tenure',Object.entries(D.tenure_dist).map(([k,v])=>[k,v,k==='미기재'?'var(--ink-3)':(k==='2년'||k==='3년'?'var(--s2)':'var(--s3)')]),
+  {labW:66,W:520,unit:'spell',rowH:20,
+   aria:'계획 임기 길이 분포. 2년 4,169건과 3년 3,710건 두 봉우리, 미기재 3,302건.'});
+
+const meRows=Object.entries(D.midExit).map(([k,v])=>[k,+(100*v[0]/v[1]).toFixed(1),LCOL[k],ttRow('','n',fmt(v[0])+' / '+fmt(v[1]))])
+  .sort((a,b)=>b[1]-a[1]);
+hbar('c-midexit',meRows,{labW:88,W:520,unit:'이탈률',suffix:'%',rowH:22,fmtV:v=>fmt1(v)+'%',
+  aria:'정치성 범주별 중도이탈 추정 비율. 군검경 16.0%가 가장 높고 관료 4.7%가 가장 낮다.'});
+
+const gp={};Object.entries(D.gender).forEach(([y,v])=>gp[y]=+(100*v[1]/(v[0]+v[1])).toFixed(1));
+lineChart('c-gender',[2021,2022,2023,2024,2025,2026],[{name:'여성 비율',v:gp,color:'var(--s5)'}],
+  {W:520,H:200,padR:78,zero:false,kSuffix:'년',fmtY:v=>fmt1(v)+'%',fmtT:v=>fmt1(v)+'%',
+   aria:'여성 임원 비율 시계열. 2021년 21.8%에서 2026년 19.1%로 하락.'});
+colStack('c-appt',yrs,[{name:'임명 spell',v:D.appt,color:'var(--s2)'}],{W:520,H:200,kSuffix:'년',
+  aria:'연도별 임명 수. 2021년 1,918건으로 최다, 2018-2020년은 좌측절단으로 낮다.'});
+
+/* 계약·감독 */
+const ssN={},ssA={};Object.entries(D.ssYear).forEach(([y,v])=>{ssN[y]=v['건수'];ssA[y]=v['총액조원'];});
+colStack('c-ss-n',[2021,2022,2023,2024,2025,2026],[{name:'계약 건수',v:ssN,color:'var(--s2)'}],
+  {W:520,H:210,kSuffix:'년',aria:'연도별 수의계약 건수. 2021-2025년 12만 건대, 2026년은 부분 연도 29,337건.'});
+colStack('c-ss-amt',[2021,2022,2023,2024,2025,2026],[{name:'총액',v:ssA,color:'var(--s4)'}],
+  {W:520,H:210,kSuffix:'년',fmtY:v=>fmt1(v),fmtT:v=>fmt1(v)+'조원',
+   aria:'연도별 수의계약 총액. 2021년 17.4조원에서 2024년 24.3조원으로 증가.'});
+table('t-ss-type',['기관유형','기관 수','계약 건수','총액 (조원)','기관당 연평균 건수'],
+  D.ssType.map(r=>[r[0],fmt(r[1]),fmt(r[2]),fmt1(r[3]),fmt(Math.round(r[2]/r[1]/6))]));
+
+const pfN={},pfA={};Object.entries(D.pfYear2).forEach(([y,v])=>{pfN[y]=v[0];pfA[y]=v[1];});
+colStack('c-pf-year',[2018,2019,2020,2021,2022,2023,2024,2025,2026],
+  [{name:'국회 지적',v:pfN,color:'var(--s2)'},{name:'감사원 지적',v:pfA,color:'var(--s1)'}],
+  {W:640,H:240,kSuffix:'년 시행',aria:'시행연도별 지적 레코드. 2020년부터 급증하며 국회 지적이 감사원의 3.4배.'});
+table('t-pf-year',['시행연도','국회','감사원','합계'],
+  [2018,2019,2020,2021,2022,2023,2024,2025,2026].map(y=>
+    [String(y),fmt(D.pfYear2[y][0]),fmt(D.pfYear2[y][1]),`<b>${fmt(D.pfYear2[y][0]+D.pfYear2[y][1])}</b>`]));
+hbar('c-pf-top',Object.entries(D.pf_top_inst).map(([k,v])=>[k,v,'var(--s2)']),
+  {labW:150,W:560,unit:'지적',rowH:18,aria:'지적이 많은 기관 상위 12개. 한국토지주택공사 840건이 최다.'});
+(function(){
+  const rows=["기타공공기관","준정부기관(위탁집행형)","공기업(준시장형)","공기업(시장형)","준정부기관(기금관리형)"]
+    .map(t=>[t,D.pfType[t]]);
+  const CO={'국회':'var(--s2)','감사원':'var(--s1)'};
+  const labW=150,W=520,pad=8,rowH=22,gap=9,plotW=W-labW-56;
+  const max=Math.max(...rows.map(q=>q[1][0]+q[1][1]));
+  const s=svg(W,rows.length*(rowH+gap)+pad*2,'기관유형별 지적 절대 건수. 기타공공기관 5,138건이 가장 많다.');
+  rows.forEach((r,i)=>{const y=pad+i*(rowH+gap),tot=r[1][0]+r[1][1];
+    txt(s,labW-10,y+rowH/2+4,r[0],'lbl','end');
+    let x=labW;
+    [['국회',r[1][0]],['감사원',r[1][1]]].forEach(([c,v])=>{
+      const w=plotW*v/max;
+      const seg=el(s,'rect',{x,y,width:Math.max(0,w-2),height:rowH,rx:1.5,style:`fill:${CO[c]}`});
+      bind(seg,`<div class="tt">${r[0]}</div>${ttRow(CO['국회'],'국회 지적',fmt(r[1][0]))}${ttRow(CO['감사원'],'감사원 지적',fmt(r[1][1]))}${ttRow('','합계',fmt(tot))}`);
+      x+=w;});
+    txt(s,x+7,y+rowH/2+4,fmt(tot),'val');});
+  mount('c-pf-type',s);
+})();
+
+/* ══ explorer ══ */
+(function(){
+  const items=D.items;
+  const q=document.getElementById('expQ'),fTop=document.getElementById('expTop'),
+        fUnit=document.getElementById('expUnit'),cnt=document.getElementById('expCount'),
+        tb=document.querySelector('#expTable tbody'),th=document.querySelector('#expTable thead');
+  [...new Set(items.map(i=>i.top))].sort().forEach(v=>fTop.add(new Option(v,v)));
+  [...new Set(items.map(i=>i.unit))].filter(Boolean).sort().forEach(v=>fUnit.add(new Option(v,v)));
+  const COLS=[['name','변수',0],['unit','단위',0],['n','n',1],['ninst','기관',1],['nzero','0값',1],
+    ['mean','평균',1],['sd','표준편차',1],['p25','p25',1],['p50','중앙값',1],['p75','p75',1],['max','최대',1]];
+  th.innerHTML='<tr>'+COLS.map((c,i)=>`<th class="sortable" data-i="${i}">${c[1]}</th>`).join('')+'</tr>';
+  let sortI=3,sortDesc=true;
+  function render(){
+    const s=q.value.trim().toLowerCase(),t=fTop.value,u=fUnit.value;
+    let rows=items.filter(i=>(!t||i.top===t)&&(!u||i.unit===u)&&
+      (!s||(i.name+' '+i.path+' '+i.key).toLowerCase().includes(s)));
+    const k=COLS[sortI][0];
+    rows.sort((a,b)=>{const x=a[k],y=b[k];
+      const r=(typeof x==='number'&&typeof y==='number')?x-y:String(x).localeCompare(String(y),'ko');
+      return sortDesc?-r:r;});
+    cnt.textContent=`${fmt(rows.length)} / ${fmt(items.length)} 변수`;
+    tb.innerHTML=rows.slice(0,400).map(i=>`<tr>
+      <td class="nm"><b>${i.name||'(무명)'}</b><span class="p" title="${i.path}">${i.key} · ${i.path}</span></td>
+      <td class="cd">${i.unit||'—'}</td><td>${fmt(i.n)}</td><td>${fmt(i.ninst)}</td>
+      <td${i.nzero/i.n>0.3?' style="color:var(--s1)"':''}>${fmt(i.nzero)}</td>
+      <td>${fmtSm(i.mean)}</td><td>${fmtSm(i.sd)}</td><td>${fmtSm(i.p25)}</td>
+      <td><b>${fmtSm(i.p50)}</b></td><td>${fmtSm(i.p75)}</td><td>${fmtSm(i.max)}</td></tr>`).join('')
+      +(rows.length>400?`<tr><td colspan="11" style="text-align:center;color:var(--ink-3);font-size:11.5px">상위 400개만 표시 — 검색으로 좁히세요</td></tr>`:'');
+    th.querySelectorAll('th').forEach((h,i)=>{h.classList.toggle('asc',i===sortI&&!sortDesc);h.classList.toggle('desc',i===sortI&&sortDesc);});
+  }
+  th.addEventListener('click',e=>{const h=e.target.closest('th');if(!h)return;
+    const i=+h.dataset.i; if(i===sortI)sortDesc=!sortDesc; else{sortI=i;sortDesc=COLS[i][2]===1;} render();});
+  [q,fTop,fUnit].forEach(e=>e.addEventListener('input',render));
+  render();
+})();
+})();
+</script>
